@@ -1,3 +1,4 @@
+
 # Zettlwirtschaft
 
 Markdown-Notiz-App mit bi-direktionaler Verlinkung im Obsidian/Notion-Stil. Schulprojekt WMC 4. Klasse.
@@ -50,3 +51,5 @@ docs/       → Wochenprotokolle, AI-Log, Fortschritt
 - Echtzeit-Updates via WebSocket
 - Mehrsprachig (DE/EN)
 - Responsive Design (Mobile-First)
+
+<img width="2816" height="1536" alt="Gemini_Generated_Image_5gepix5gepix5gep" src="https://github.com/user-attachments/assets/c0f43638-2830-4c50-ba89-2c3fe87b1edc" />
