@@ -1,7 +1,20 @@
-<!-- TODO: Root-Layout der gesamten App.
-     Importiert app.css (Tailwind), rendert Navbar oben, Sidebar links, <slot /> rechts.
-     Prüft bei jedem Route-Wechsel ob JWT vorhanden, leitet bei fehlender Auth zu /auth um.
-     Initialisiert WebSocket-Verbindung und globalen $state. -->
 <script>
   import '../app.css';
+  import { page } from '$app/stores';
+  import Sidebar from '$lib/components/layout/Sidebar.svelte';
+
+  let { children } = $props();
+
+  let isPublicRoute = $derived($page.url.pathname === '/auth' || $page.url.pathname === '/');
 </script>
+
+{#if isPublicRoute}
+  {@render children()}
+{:else}
+  <div style="display:flex;height:100vh;overflow:hidden;font-family:Inter,system-ui,sans-serif;">
+    <Sidebar />
+    <main style="flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column;">
+      {@render children()}
+    </main>
+  </div>
+{/if}
