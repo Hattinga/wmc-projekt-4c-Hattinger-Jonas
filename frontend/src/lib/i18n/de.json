@@ -1,0 +1,27 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "graph": "Graph",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "username": "Benutzername",
+    "confirmPassword": "Passwort bestätigen"
+  },
+  "notes": {
+    "newNote": "Neue Notiz",
+    "untitled": "Ohne Titel",
+    "noNotes": "Keine Notizen vorhanden",
+    "backlinks": "Verweise auf diese Notiz",
+    "save": "Speichern",
+    "delete": "Löschen"
+  },
+  "search": {
+    "placeholder": "Notizen durchsuchen..."
+  }
+}
