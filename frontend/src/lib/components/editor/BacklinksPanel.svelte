@@ -17,22 +17,25 @@
 
 <div style="border-top:1px solid rgba(26,26,46,0.10);background:#fff;flex-shrink:0;">
   <!-- Header -->
-  <button
-    onclick={() => open = !open}
-    style="width:100%;height:44px;padding:0 20px;display:flex;align-items:center;gap:10px;cursor:pointer;border:none;background:transparent;font-family:inherit;"
-  >
-    <Icon name={open ? 'chevDown' : 'chevRight'} size={14} color="#888899" />
-    <Icon name="link2" size={14} color="#e94560" />
-    <span style="font-size:13px;font-weight:600;color:#1a1a2e;">{backlinks.length} Backlinks</span>
-    <span style="font-size:12px;color:#888899;">· Notizen, die hierher verlinken</span>
-    <span style="flex:1;"></span>
+  <div style="width:100%;height:44px;padding:0 20px;display:flex;align-items:center;gap:10px;">
     <button
-      onclick={(e) => { e.stopPropagation(); goto('/graph'); }}
-      style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;"
+      onclick={() => open = !open}
+      style="display:flex;align-items:center;gap:10px;flex:1;cursor:pointer;border:none;background:transparent;font-family:inherit;padding:0;height:100%;"
+      aria-expanded={open}
+    >
+      <Icon name={open ? 'chevDown' : 'chevRight'} size={14} color="#888899" />
+      <Icon name="link2" size={14} color="#e94560" />
+      <span style="font-size:13px;font-weight:600;color:#1a1a2e;">{backlinks.length} Backlinks</span>
+      <span style="font-size:12px;color:#888899;">· Notizen, die hierher verlinken</span>
+    </button>
+    <button
+      onclick={() => goto('/graph')}
+      style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;"
+      aria-label="Graph-Ansicht öffnen"
     >
       <Icon name="graph" size={13} />
     </button>
-  </button>
+  </div>
 
   {#if open}
     <div style="padding:4px 20px 16px;display:flex;gap:10px;overflow-x:auto;">
