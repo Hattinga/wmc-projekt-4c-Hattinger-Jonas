@@ -1,0 +1,139 @@
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b6b80;
+  margin-bottom: 6px;
+}
+
+.login-form-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(26, 26, 46, 0.12);
+  border-radius: 10px;
+  background: #f6f5f2;
+  height: 46px;
+  transition: border-color 0.15s;
+}
+
+.login-form-input-wrap:focus-within {
+  border-color: rgba(233, 69, 96, 0.4);
+}
+
+.login-form-icon {
+  color: #888899;
+  padding-left: 12px;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.login-form-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13.5px;
+  color: #1a1a2e;
+  font-family: inherit;
+  padding: 12px 12px 12px 8px;
+}
+
+.login-form-input::placeholder {
+  color: rgba(26, 26, 46, 0.3);
+}
+
+.login-form-pw-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888899;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+}
+
+.login-form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: -2px;
+}
+
+.login-form-remember {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: #6b6b80;
+  cursor: pointer;
+}
+
+.login-form-remember input[type="checkbox"] {
+  accent-color: #e94560;
+}
+
+.login-form-forgot {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12.5px;
+  color: #e94560;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.login-form-forgot:hover {
+  text-decoration: underline;
+}
+
+.login-form-submit {
+  margin-top: 4px;
+  height: 46px;
+  border: none;
+  border-radius: 10px;
+  background: #e94560;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 20px rgba(233, 69, 96, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: box-shadow 0.15s, transform 0.1s;
+}
+
+.login-form-submit:hover {
+  box-shadow: 0 6px 24px rgba(233, 69, 96, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.login-form-submit:active {
+  transform: scale(0.98);
+}
+
+.login-form-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.login-form-error {
+  font-size: 12.5px;
+  color: #e94560;
+  background: rgba(233, 69, 96, 0.08);
+  border-radius: 8px;
+  padding: 9px 12px;
+}

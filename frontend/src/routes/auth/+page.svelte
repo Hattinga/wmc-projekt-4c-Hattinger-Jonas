@@ -2,138 +2,186 @@
   import { goto } from '$app/navigation';
   import Icon from '$lib/components/ui/Icon.svelte';
   import { appState } from '$lib/stores/appState.svelte.js';
+  import LoginForm from '$lib/components/auth/LoginForm.svelte';
+  import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
+  import '$lib/components/auth/authPage.css';
 
   let mode = $state('login');
-  let showPw = $state(false);
   let langOpen = $state(false);
+  let loading = $state(false);
+  let error = $state('');
 
-  let username = $state('');
-  let email = $state('');
-  let password = $state('');
-  let passwordConfirm = $state('');
-  let rememberMe = $state(true);
-
-  function handleSubmit() {
-    goto('/dashboard');
+  async function handleAuth(apiFn) {
+    loading = true;
+    error = '';
+    try {
+      await apiFn();
+      goto('/dashboard');
+    } catch (e) {
+      error = e.message;
+    } finally {
+      loading = false;
+    }
   }
 
-  const dotBg = `url("data:image/svg+xml,%3Csvg width='28' height='28' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='2' cy='2' r='1' fill='%23000' fill-opacity='0.06'/%3E%3C/svg%3E")`;
+  function handleLogin(data) {
+    // TODO: return api.login(data.email, data.password).then(r => localStorage.setItem('zw-token', r.token));
+    return handleAuth(() => Promise.resolve());
+  }
+
+  function handleRegister(data) {
+    // TODO: return api.register(data.username, data.email, data.password).then(r => localStorage.setItem('zw-token', r.token));
+    return handleAuth(() => Promise.resolve());
+  }
+
+  /*
+   * BACKGROUND OPTIONS — change .auth-page background in authPage.css:
+   *
+   * A) Current: #f6f5f2 + animated SVG knowledge-graph (default)
+   *
+   * B) Dark library photo — search unsplash.com: "dark library atmospheric books moody"
+   *    Save to frontend/static/bg-library.jpg, set background: url('/bg-library.jpg') center/cover
+   *    Add a dark overlay: <div style="position:absolute;inset:0;background:rgba(4,4,16,0.55);">
+   *
+   * C) Abstract network → "neural network abstract dark glowing lines"
+   * D) Misty forest     → "dark forest fog atmospheric night"
+   * E) Old parchment    → "vintage parchment paper macro texture"
+   */
 </script>
 
-<div style="width:100%;height:100vh;position:relative;background:#f6f5f2;background-image:{dotBg};font-family:Inter,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+<div class="auth-page">
 
-  <!-- Accent blobs -->
-  <div style="position:absolute;top:-120px;left:-80px;width:360px;height:360px;background:radial-gradient(circle,rgba(233,69,96,0.10),transparent 70%);pointer-events:none;"></div>
-  <div style="position:absolute;bottom:-160px;right:-100px;width:420px;height:420px;background:radial-gradient(circle,rgba(26,26,46,0.08),transparent 70%);pointer-events:none;"></div>
+  <!--
+    BACKGROUND: animated knowledge-graph (SVG).
+    Replace this entire <svg> with an <img> for a photo background.
+    Animation classes (zw-node, zw-edge) are defined in app.css.
+  -->
+  <svg class="auth-page-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="glow-red" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-blue" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <!-- Halo rings (light-mode opacity) -->
+    <circle class="zw-node n1"  cx="86"   cy="108" r="20" fill="rgba(233,69,96,0.08)"/>
+    <circle class="zw-node n5"  cx="360"  cy="612" r="26" fill="rgba(233,69,96,0.08)"/>
+    <circle class="zw-node n9"  cx="1066" cy="558" r="22" fill="rgba(233,69,96,0.08)"/>
+    <circle class="zw-node n12" cx="1382" cy="792" r="20" fill="rgba(233,69,96,0.08)"/>
+    <circle class="zw-node n4"  cx="320"  cy="200" r="22" fill="rgba(45,127,211,0.08)"/>
+    <circle class="zw-node n8"  cx="1008" cy="162" r="26" fill="rgba(45,127,211,0.08)"/>
+    <circle class="zw-node n11" cx="1354" cy="126" r="20" fill="rgba(45,127,211,0.08)"/>
+
+    <!-- Edges (dark on light bg) -->
+    <line class="zw-edge e1"  x1="86"   y1="108" x2="320"  y2="200" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e2"  x1="86"   y1="108" x2="216"  y2="468" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e3"  x1="216"  y1="468" x2="360"  y2="612" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e4"  x1="216"  y1="468" x2="144"  y2="720" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e5"  x1="320"  y1="200" x2="360"  y2="612" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e6"  x1="320"  y1="200" x2="605"  y2="72"  stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e7"  x1="605"  y1="72"  x2="835"  y2="54"  stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e8"  x1="605"  y1="72"  x2="1008" y2="162" stroke="rgba(26,26,46,0.06)" stroke-width="0.7"/>
+    <line class="zw-edge e9"  x1="360"  y1="612" x2="547"  y2="828" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e10" x1="547"  y1="828" x2="893"  y2="846" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e11" x1="1008" y1="162" x2="1066" y2="558" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e12" x1="1008" y1="162" x2="1354" y2="126" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e13" x1="1066" y1="558" x2="1210" y2="342" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e14" x1="1066" y1="558" x2="1296" y2="648" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e15" x1="1210" y1="342" x2="1296" y2="648" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e16" x1="1296" y1="648" x2="1382" y2="792" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e17" x1="1354" y1="126" x2="835"  y2="54"  stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+    <line class="zw-edge e18" x1="1382" y1="792" x2="893"  y2="846" stroke="rgba(26,26,46,0.08)" stroke-width="0.8"/>
+
+    <!-- Red accent nodes -->
+    <circle class="zw-node n1"  cx="86"   cy="108" r="4"   fill="#e94560" filter="url(#glow-red)"/>
+    <circle class="zw-node n5"  cx="360"  cy="612" r="5"   fill="#e94560" filter="url(#glow-red)"/>
+    <circle class="zw-node n9"  cx="1066" cy="558" r="4"   fill="#e94560" filter="url(#glow-red)"/>
+    <circle class="zw-node n12" cx="1382" cy="792" r="4"   fill="#e94560" filter="url(#glow-red)"/>
+    <!-- Blue accent nodes -->
+    <circle class="zw-node n4"  cx="320"  cy="200" r="4"   fill="#2d7fd3" filter="url(#glow-blue)"/>
+    <circle class="zw-node n8"  cx="1008" cy="162" r="5"   fill="#2d7fd3" filter="url(#glow-blue)"/>
+    <circle class="zw-node n11" cx="1354" cy="126" r="3.5" fill="#2d7fd3" filter="url(#glow-blue)"/>
+    <!-- Dim nodes (dark-on-light) -->
+    <circle class="zw-node n2"  cx="216"  cy="468" r="3"   fill="rgba(26,26,46,0.18)"/>
+    <circle class="zw-node n3"  cx="144"  cy="720" r="2.5" fill="rgba(26,26,46,0.12)"/>
+    <circle class="zw-node n6"  cx="605"  cy="72"  r="3"   fill="rgba(26,26,46,0.18)"/>
+    <circle class="zw-node n7"  cx="547"  cy="828" r="3"   fill="rgba(26,26,46,0.12)"/>
+    <circle class="zw-node n10" cx="1210" cy="342" r="3.5" fill="rgba(26,26,46,0.18)"/>
+    <circle class="zw-node n13" cx="1296" cy="648" r="3"   fill="rgba(26,26,46,0.12)"/>
+    <circle class="zw-node n14" cx="835"  cy="54"  r="2.5" fill="rgba(26,26,46,0.12)"/>
+    <circle class="zw-node n15" cx="893"  cy="846" r="2.5" fill="rgba(26,26,46,0.12)"/>
+  </svg>
+
+  <div class="auth-page-vignette"></div>
+  <div class="auth-page-glow"></div>
 
   <!-- Logo -->
-  <div style="position:absolute;top:56px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:8px;">
-    <div style="width:30px;height:30px;border-radius:6px;background:#e94560;display:flex;align-items:center;justify-content:center;">
+  <div class="zw-auth-logo auth-page-logo">
+    <div class="auth-page-logo-icon">
       <Icon name="penLine" size={16} color="#fff" strokeWidth={2.2} />
     </div>
-    <span style="font-size:18px;font-weight:700;letter-spacing:-0.3px;color:#1a1a2e;">Zettlwirtschaft</span>
+    <span class="auth-page-logo-text">Zettlwirtschaft</span>
   </div>
 
-  <!-- Card -->
-  <div style="width:420px;background:#fff;border-radius:14px;padding:40px 40px 36px;box-shadow:0 1px 0 rgba(26,26,46,0.04),0 14px 40px rgba(26,26,46,0.08),0 2px 8px rgba(26,26,46,0.04);border:1px solid rgba(26,26,46,0.06);position:relative;z-index:1;">
-
-    <h1 style="margin:0;font-size:26px;font-weight:700;color:#1a1a2e;letter-spacing:-0.5px;">
+  <!-- Auth card -->
+  <div class="zw-auth-card auth-page-card">
+    <h1 class="auth-page-title">
       {mode === 'login' ? 'Willkommen zurück' : 'Konto erstellen'}
     </h1>
-    <p style="margin:6px 0 22px;font-size:13.5px;color:#6b6b80;">
-      {mode === 'login' ? 'Melde dich an, um deine Notizen zu öffnen.' : 'Starte deine vernetzte Wissensbasis.'}
+    <p class="auth-page-subtitle">
+      {mode === 'login'
+        ? 'Melde dich an, um deine Notizen zu öffnen.'
+        : 'Starte deine vernetzte Wissensbasis.'}
     </p>
 
-    <!-- Tabs -->
-    <div style="display:flex;background:#f1f0ec;border-radius:10px;padding:4px;margin-bottom:22px;position:relative;">
-      <div style="position:absolute;top:4px;bottom:4px;width:calc(50% - 4px);left:{mode === 'login' ? '4px' : 'calc(50% + 0px)'};background:#fff;border-radius:7px;box-shadow:0 1px 3px rgba(26,26,46,0.08);transition:left 0.22s cubic-bezier(0.4,0,0.2,1);"></div>
+    <!-- Tab switcher -->
+    <div class="auth-page-tabs">
+      <div
+        class="auth-page-tab-indicator"
+        style="left: {mode === 'login' ? '4px' : 'calc(50%)'}"
+      ></div>
       {#each ['login', 'register'] as m}
         <button
-          onclick={() => { mode = m; }}
-          style="flex:1;position:relative;border:none;background:transparent;padding:9px 0;font-size:13.5px;font-weight:600;color:{mode === m ? '#1a1a2e' : '#888899'};cursor:pointer;font-family:inherit;transition:color 0.2s;"
+          type="button"
+          onclick={() => { mode = m; error = ''; }}
+          class="auth-page-tab-btn {mode === m ? 'auth-page-tab-btn--active' : 'auth-page-tab-btn--inactive'}"
         >
           {m === 'login' ? 'Anmelden' : 'Registrieren'}
         </button>
       {/each}
     </div>
 
-    <!-- Fields -->
-    <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} style="display:flex;flex-direction:column;gap:14px;">
-      {#if mode === 'register'}
-        <div>
-          <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">Benutzername</label>
-          <div style="display:flex;align-items:center;border:1px solid rgba(26,26,46,0.12);border-radius:10px;background:#fafaf8;height:46px;">
-            <span style="color:#a0a0b0;padding-left:12px;display:flex;"><Icon name="user" size={16} /></span>
-            <input bind:value={username} placeholder="max.notiz" style="flex:1;border:none;outline:none;background:transparent;font-size:13.5px;color:#1a1a2e;font-family:inherit;padding:12px 12px 12px 8px;" />
-          </div>
-        </div>
-      {/if}
-
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">E-Mail</label>
-        <div style="display:flex;align-items:center;border:1px solid rgba(26,26,46,0.12);border-radius:10px;background:#fafaf8;height:46px;">
-          <span style="color:#a0a0b0;padding-left:12px;display:flex;"><Icon name="mail" size={16} /></span>
-          <input bind:value={email} type="email" placeholder="max@zettl.de" style="flex:1;border:none;outline:none;background:transparent;font-size:13.5px;color:#1a1a2e;font-family:inherit;padding:12px 12px 12px 8px;" />
-        </div>
-      </div>
-
-      <div>
-        <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">Passwort</label>
-        <div style="display:flex;align-items:center;border:1px solid rgba(26,26,46,0.12);border-radius:10px;background:#fafaf8;height:46px;">
-          <span style="color:#a0a0b0;padding-left:12px;display:flex;"><Icon name="lock" size={16} /></span>
-          <input bind:value={password} type={showPw ? 'text' : 'password'} placeholder="••••••••••" style="flex:1;border:none;outline:none;background:transparent;font-size:13.5px;color:#1a1a2e;font-family:inherit;padding:12px 12px 12px 8px;" />
-          <button type="button" onclick={() => showPw = !showPw} style="background:none;border:none;cursor:pointer;color:#a0a0b0;padding:0 12px;display:flex;align-items:center;">
-            <Icon name={showPw ? 'eyeOff' : 'eye'} size={16} />
-          </button>
-        </div>
-      </div>
-
-      {#if mode === 'register'}
-        <div>
-          <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">Passwort bestätigen</label>
-          <div style="display:flex;align-items:center;border:1px solid rgba(26,26,46,0.12);border-radius:10px;background:#fafaf8;height:46px;">
-            <span style="color:#a0a0b0;padding-left:12px;display:flex;"><Icon name="lock" size={16} /></span>
-            <input bind:value={passwordConfirm} type="password" placeholder="••••••••••" style="flex:1;border:none;outline:none;background:transparent;font-size:13.5px;color:#1a1a2e;font-family:inherit;padding:12px 12px 12px 8px;" />
-          </div>
-        </div>
-      {/if}
-
-      {#if mode === 'login'}
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:-2px;">
-          <label style="display:flex;align-items:center;gap:7px;font-size:12.5px;color:#6b6b80;cursor:pointer;">
-            <input type="checkbox" bind:checked={rememberMe} style="accent-color:#e94560;" />
-            Eingeloggt bleiben
-          </label>
-          <a href="#" style="font-size:12.5px;color:#e94560;text-decoration:none;font-weight:500;">Passwort vergessen?</a>
-        </div>
-      {/if}
-
-      <button
-        type="submit"
-        style="margin-top:4px;height:46px;border:none;border-radius:10px;background:#e94560;color:#fff;font-weight:600;font-size:14px;letter-spacing:-0.2px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(233,69,96,0.30),inset 0 1px 0 rgba(255,255,255,0.18);"
-      >
-        {mode === 'login' ? 'Anmelden' : 'Konto erstellen'}
-        <Icon name="arrowRight" size={16} color="#fff" strokeWidth={2.2} />
-      </button>
-    </form>
+    <!-- Forms (stubs render nothing until LoginForm/RegisterForm PRs merge) -->
+    {#if mode === 'login'}
+      <LoginForm onsubmit={handleLogin} {loading} {error} />
+    {:else}
+      <RegisterForm onsubmit={handleRegister} {loading} {error} />
+    {/if}
   </div>
 
   <!-- Language picker -->
-  <div style="position:absolute;bottom:28px;right:28px;z-index:2;">
+  <div class="auth-page-lang-wrap">
     <button
+      type="button"
       onclick={() => langOpen = !langOpen}
-      style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(26,26,46,0.10);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:12.5px;font-weight:500;color:#1a1a2e;font-family:inherit;box-shadow:0 2px 6px rgba(26,26,46,0.04);"
+      class="auth-page-lang-btn"
     >
-      <span style="font-size:14px;">{appState.locale === 'de' ? '🇩🇪' : '🇬🇧'}</span>
+      <span class="auth-page-lang-flag">{appState.locale === 'de' ? '🇩🇪' : '🇬🇧'}</span>
       {appState.locale === 'de' ? 'DE' : 'EN'}
-      <Icon name="chevDown" size={12} color="#888" />
+      <Icon name="chevDown" size={12} color="#888899" />
     </button>
     {#if langOpen}
-      <div style="position:absolute;bottom:calc(100% + 6px);right:0;background:#fff;border:1px solid rgba(26,26,46,0.10);border-radius:8px;padding:4px;min-width:110px;box-shadow:0 8px 24px rgba(26,26,46,0.10);">
+      <div class="auth-page-lang-dropdown">
         {#each [['de', '🇩🇪', 'Deutsch'], ['en', '🇬🇧', 'English']] as [code, flag, label]}
           <button
+            type="button"
             onclick={() => { appState.locale = code; langOpen = false; }}
-            style="display:flex;align-items:center;gap:8px;width:100%;border:none;background:{appState.locale === code ? '#f6f5f2' : 'transparent'};padding:7px 10px;border-radius:5px;font-size:12.5px;font-weight:500;color:#1a1a2e;cursor:pointer;font-family:inherit;text-align:left;"
+            class="auth-page-lang-option {appState.locale === code ? 'auth-page-lang-option--active' : 'auth-page-lang-option--inactive'}"
           >
             <span>{flag}</span> {label}
           </button>
@@ -142,5 +190,5 @@
     {/if}
   </div>
 
-  <div style="position:absolute;bottom:32px;left:28px;font-size:11.5px;color:#a0a0b0;">© 2026 Zettlwirtschaft</div>
+  <span class="auth-page-copyright">© 2026 Zettlwirtschaft</span>
 </div>

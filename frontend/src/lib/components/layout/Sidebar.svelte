@@ -60,7 +60,7 @@
   <!-- Ordner -->
   <div style="padding:6px 10px 10px;">
     <div style="font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.8px;text-transform:uppercase;padding:6px 8px;">Ordner</div>
-    {#each appState.folders.length ? appState.folders : defaultFolders as folder}
+    {#each appState.folders?.length ? appState.folders : defaultFolders as folder}
       <div>
         <button
           onclick={() => folder.children && toggleFolder(folder.id)}
@@ -92,7 +92,7 @@
   <div style="padding:6px 10px 10px;">
     <div style="font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.8px;text-transform:uppercase;padding:6px 8px;">Tags</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 8px 0;">
-      {#each appState.tags.length ? appState.tags : defaultTags as tag}
+      {#each appState.tags?.length ? appState.tags : defaultTags as tag}
         <span style="font-size:11px;padding:3px 8px;border-radius:10px;background:oklch(0.32 0.07 {tag.hue});color:oklch(0.92 0.08 {tag.hue});border:1px solid oklch(0.42 0.10 {tag.hue} / 0.6);display:inline-flex;align-items:center;gap:4px;font-weight:500;cursor:pointer;">
           #{tag.name}
           <span style="opacity:0.5;font-size:10px;">{tag.count}</span>
