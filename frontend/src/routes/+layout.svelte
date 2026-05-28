@@ -1,11 +1,19 @@
 <script>
   import '../app.css';
   import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
   import Sidebar from '$lib/components/layout/Sidebar.svelte';
 
   let { children } = $props();
 
   let isPublicRoute = $derived($page.url.pathname === '/auth' || $page.url.pathname === '/');
+
+  $effect(() => {
+    if (!isPublicRoute) {
+      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('zw-token') : null;
+      if (!token) goto('/auth');
+    }
+  });
 </script>
 
 {#if isPublicRoute}

@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import Icon from '$lib/components/ui/Icon.svelte';
   import { appState } from '$lib/stores/appState.svelte.js';
+  import * as api from '$lib/services/api.js';
   import LoginForm from '$lib/components/auth/LoginForm.svelte';
   import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
   import '$lib/components/auth/authPage.css';
@@ -25,13 +26,21 @@
   }
 
   function handleLogin(data) {
-    // TODO: return api.login(data.email, data.password).then(r => localStorage.setItem('zw-token', r.token));
-    return handleAuth(() => Promise.resolve());
+    return handleAuth(async () => {
+      const r = await api.login(data.email, data.password);
+      localStorage.setItem('zw-token', r.token);
+      localStorage.setItem('zw-user', JSON.stringify(r.user));
+      appState.currentUser = r.user;
+    });
   }
 
   function handleRegister(data) {
-    // TODO: return api.register(data.username, data.email, data.password).then(r => localStorage.setItem('zw-token', r.token));
-    return handleAuth(() => Promise.resolve());
+    return handleAuth(async () => {
+      const r = await api.register(data.username, data.email, data.password);
+      localStorage.setItem('zw-token', r.token);
+      localStorage.setItem('zw-user', JSON.stringify(r.user));
+      appState.currentUser = r.user;
+    });
   }
 
   /*

@@ -2,8 +2,9 @@
 -- NUR für lokale Entwicklung – NICHT in Produktion ausführen!
 -- Passwort für alle Test-User: "password123" (bcrypt-Hash)
 
+-- Passwort: password123
 INSERT OR IGNORE INTO users (username, email, password_hash) VALUES
-  ('testuser', 'test@example.com', '$2b$10$placeholder_hash_replace_with_real_bcrypt');
+  ('testuser', 'test@example.com', '$2b$10$rtX55avIzvz9u4wT2zQWieMXy4xwrBmNMQUu2xIL.TziM7u4RRiuC');
 
 -- Beispiel-Ordner
 INSERT OR IGNORE INTO folders (name, user_id) VALUES

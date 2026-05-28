@@ -89,4 +89,25 @@
 
 ---
 
+## KW 22 (26.05.–01.06.2026)
+
+### Session 8 – 28.05.2026
+- **Tool:** Claude Code (CLI) — /batch Kommando (serial ausgeführt)
+- **Zweck:** KW-21-Backfill – Backend-Auth vollständig implementieren + Frontend verdrahten
+- **Audit-Ergebnis:** 12 von 12 Backend-Quelldateien waren reine TODO-Stubs (0% implementiert). `routes/auth/+page.svelte` feuerte `Promise.resolve()` statt echtem API-Aufruf.
+- **Umgesetzte Änderungen:**
+  - `backend/package.json` – `dotenv ^16.4.0` ergänzt; `better-sqlite3` auf v12.x aktualisiert (prebuilt für Node 24, kein C++ Toolset nötig)
+  - `backend/src/config/database.js` – `better-sqlite3`-Verbindung, PRAGMA foreign_keys, Schema-Bootstrap via `schema.sql`
+  - `backend/src/models/User.js` – `create`, `findByEmail`, `findById`, `update`, `delete` mit prepared statements; SQLITE_CONSTRAINT_UNIQUE → `DUPLICATE`-Error
+  - `backend/src/middleware/auth.js` – Bearer-Token parsen, `jwt.verify`, `req.user` setzen, 401 bei fehlendem/ungültigem Token
+  - `backend/src/routes/auth.js` – `POST /register`, `POST /login`, `GET /me`, `PATCH /me`; antwortet `{ token, user }` (kein `password_hash`)
+  - `backend/src/index.js` – Express + CORS + JSON-Parser, nur `/api/auth` gemountet (andere Routen noch Stubs → KW 22)
+  - `backend/db/seed.sql` – Placeholder-bcrypt-Hash durch echten `bcrypt.hash('password123', 10)`-Wert ersetzt
+  - `frontend/src/lib/stores/appState.svelte.js` – `currentUser: null` hinzugefügt; `locale` + `currentUser` werden beim Start aus localStorage geladen
+  - `frontend/src/routes/auth/+page.svelte` – `handleLogin`/`handleRegister` rufen nun `api.login`/`api.register` auf, schreiben Token + User in localStorage, setzen `appState.currentUser`
+  - `frontend/src/routes/+layout.svelte` – `$effect`-Auth-Guard: leitet ohne Token auf `/auth` weiter
+  - `frontend/src/lib/services/api.js` – Fehlerauswertung liest jetzt `err.error || err.message` (Backend gibt `{ error }` zurück)
+- **Verifiziert:** `POST /register` → 201 + `{ token, user }` ✅; `POST /login` → 200 + Token ✅; `GET /me` mit Bearer → User ✅; falsches Passwort → 401 ✅; kein Token → Auth-Guard leitet weiter ✅
+- **Integration:** Login-Flow funktioniert end-to-end. Backend-Routen für Notes/Folders/Tags/Graph und WebSocket sind bewusst auf KW 22/23 verschoben.
+
 <!-- Weitere Sessions hier anhängen -->
