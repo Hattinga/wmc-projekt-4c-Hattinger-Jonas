@@ -110,4 +110,12 @@
 - **Verifiziert:** `POST /register` → 201 + `{ token, user }` ✅; `POST /login` → 200 + Token ✅; `GET /me` mit Bearer → User ✅; falsches Passwort → 401 ✅; kein Token → Auth-Guard leitet weiter ✅
 - **Integration:** Login-Flow funktioniert end-to-end. Backend-Routen für Notes/Folders/Tags/Graph und WebSocket sind bewusst auf KW 22/23 verschoben.
 
+### Session 9 – 28.05.2026
+- **Tool:** Claude (Opus 4.7, Chat)
+- **Zweck:** Konzeptuelles Verständnis der JWT-Authentifizierung absichern
+- **Prompt (Zusammenfassung):** „Wie funktioniert ein JWT?“ → Aufbau aus Header, Payload und Signature; „Wie sende ich den Token bei einem Request mit?“ → `Authorization: Bearer`-Header und passende Express-Middleware
+- **Ergebnis:** Auth-Flow fachlich nachgezogen; JWT-Struktur und Bearer-Weitergabe klar eingeordnet
+- **Integration:** Diente als Absicherung der bereits implementierten JWT-Middleware und als Grundlage für die Präsentation
+
+### 
 <!-- Weitere Sessions hier anhängen -->
