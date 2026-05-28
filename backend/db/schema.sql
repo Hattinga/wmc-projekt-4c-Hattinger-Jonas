@@ -60,10 +60,18 @@ CREATE TABLE IF NOT EXISTS note_tags (
   FOREIGN KEY (tag_id)  REFERENCES tags(id)  ON DELETE CASCADE
 );
 
--- Trigger: updated_at automatisch setzen
-CREATE TRIGGER IF NOT EXISTS notes_updated_at
-  AFTER UPDATE ON notes
+-- Trigger: DROP + CREATE damit bei Server-Neustart der korrigierte Trigger aktiv wird.
+-- AFTER UPDATE OF ... verhindert Rekursion: updated_at-Updates feuern den Trigger nicht.
+DROP TRIGGER IF EXISTS notes_updated_at;
+CREATE TRIGGER notes_updated_at
+  AFTER UPDATE OF title, content, folder_id ON notes
   FOR EACH ROW
 BEGIN
   UPDATE notes SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
 END;
+
+-- Indizes für häufig gefilterte Spalten
+CREATE INDEX IF NOT EXISTS idx_notes_user        ON notes(user_id);
+CREATE INDEX IF NOT EXISTS idx_notes_folder      ON notes(folder_id);
+CREATE INDEX IF NOT EXISTS idx_folders_user      ON folders(user_id);
+CREATE INDEX IF NOT EXISTS idx_note_links_target ON note_links(target_id);

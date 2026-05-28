@@ -1,7 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
   import Icon from '$lib/components/ui/Icon.svelte';
-  import { appState } from '$lib/stores/appState.svelte.js';
+  import { appState, logout } from '$lib/stores/appState.svelte.js';
   import { setLocale } from '$lib/i18n/index.js';
 
   let activeSection = $state('profil');
@@ -19,7 +19,8 @@
   let compactMode = $state(false);
   let animations = $state(true);
   let autoBackup = $state(true);
-  let saveMsg = $state('');
+
+  const STUB_TITLE = 'In KW 23 verfügbar';
 
   const sections = [
     { id: 'profil', ic: 'user', label: 'Profil' },
@@ -30,18 +31,8 @@
     { id: 'benachrichtigungen', ic: 'bell', label: 'Benachrichtigungen' },
   ];
 
-  async function saveProfile() {
-    // TODO: API-Aufruf
-    saveMsg = 'Gespeichert!';
-    setTimeout(() => saveMsg = '', 2000);
-  }
-
-  function logout() {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('zw-token');
-      localStorage.removeItem('zw-user');
-    }
-    appState.currentUser = null;
+  function handleLogout() {
+    logout();
     goto('/auth');
   }
 </script>
@@ -55,9 +46,6 @@
     </button>
     <h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-0.3px;">Einstellungen</h2>
     <span style="flex:1;"></span>
-    {#if saveMsg}
-      <span style="font-size:12px;color:#2a9d6e;font-weight:500;">{saveMsg}</span>
-    {/if}
     <div style="width:34px;height:34px;border-radius:17px;background:linear-gradient(135deg,#1a1a2e,#2d2d4a);color:#fff;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;">
       {appState.currentUser?.username?.slice(0,2).toUpperCase() || 'MN'}
     </div>
@@ -93,7 +81,7 @@
                 {username.slice(0,2).toUpperCase()}
               </div>
               <div>
-                <button style="height:34px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:8px;background:#fff;color:#1a1a2e;font-weight:500;font-size:12.5px;cursor:pointer;font-family:inherit;display:block;margin-bottom:6px;">Bild ändern</button>
+                <button disabled title={STUB_TITLE} style="height:34px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:8px;background:#fff;color:#888899;font-weight:500;font-size:12.5px;cursor:not-allowed;font-family:inherit;display:block;margin-bottom:6px;opacity:0.6;">Bild ändern</button>
                 <span style="font-size:11.5px;color:#888899;">JPG, PNG · max. 2 MB</span>
               </div>
             </div>
@@ -114,7 +102,7 @@
                 <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">Über mich</label>
                 <textarea bind:value={bio} style="width:100%;padding:10px 14px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;font-size:13.5px;color:#1a1a2e;font-family:inherit;outline:none;min-height:64px;resize:vertical;box-sizing:border-box;"></textarea>
               </div>
-              <button onclick={saveProfile} style="height:42px;border:none;border-radius:9px;background:#1a1a2e;color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;font-family:inherit;">Änderungen speichern</button>
+              <button disabled title={STUB_TITLE} style="height:42px;border:none;border-radius:9px;background:#888899;color:#fff;font-weight:600;font-size:13.5px;cursor:not-allowed;font-family:inherit;opacity:0.7;">Änderungen speichern</button>
             </div>
           </div>
 
@@ -129,13 +117,14 @@
                   <input type="password" value={val} oninput={(e) => setter(e.currentTarget.value)} placeholder="••••••••••" style="width:100%;height:42px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;font-size:13.5px;color:#1a1a2e;font-family:inherit;outline:none;box-sizing:border-box;" />
                 </div>
               {/each}
+              <button disabled title={STUB_TITLE} style="height:42px;border:none;border-radius:9px;background:#888899;color:#fff;font-weight:600;font-size:13.5px;cursor:not-allowed;font-family:inherit;opacity:0.7;">Passwort ändern</button>
               <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid rgba(26,26,46,0.06);">
                 <div style="flex:1;">
                   <div style="font-size:13.5px;font-weight:500;">Zwei-Faktor-Authentifizierung</div>
                   <div style="font-size:12px;color:#888899;margin-top:2px;">Sichere dein Konto mit einer Authenticator-App.</div>
                 </div>
-                <button onclick={() => twoFactor = !twoFactor} style="width:38px;height:22px;border-radius:11px;background:{twoFactor ? '#e94560' : 'rgba(26,26,46,0.20)'};border:none;cursor:pointer;position:relative;transition:background 0.2s;">
-                  <div style="position:absolute;top:2px;left:{twoFactor ? '18px' : '2px'};width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left 0.2s;"></div>
+                <button disabled title={STUB_TITLE} style="width:38px;height:22px;border-radius:11px;background:rgba(26,26,46,0.20);border:none;cursor:not-allowed;position:relative;opacity:0.6;">
+                  <div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
                 </button>
               </div>
             </div>
@@ -157,10 +146,10 @@
         {:else if activeSection === 'darstellung'}
           <div style="margin-bottom:32px;">
             <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">Darstellung</h3>
-            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">Light oder Dark Mode.</p>
+            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">Light oder Dark Mode (in KW 23 verfügbar).</p>
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
               {#each [['light', 'Hell', '#fff', '#1a1a2e'], ['dark', 'Dunkel', '#1a1a2e', '#fff'], ['system', 'System', 'linear-gradient(135deg,#fff 50%,#1a1a2e 50%)', '#1a1a2e']] as [key, label, bg, fg]}
-                <button onclick={() => theme = key} style="width:130px;padding:10px;border-radius:10px;background:#fff;border:2px solid {theme === key ? '#e94560' : 'rgba(26,26,46,0.10)'};cursor:pointer;font-family:inherit;text-align:center;box-shadow:{theme === key ? '0 2px 8px rgba(233,69,96,0.15)' : 'none'};">
+                <button disabled title={STUB_TITLE} style="width:130px;padding:10px;border-radius:10px;background:#fff;border:2px solid {theme === key ? '#e94560' : 'rgba(26,26,46,0.10)'};cursor:not-allowed;font-family:inherit;text-align:center;opacity:0.7;">
                   <div style="height:60px;border-radius:6px;background:{bg};margin-bottom:8px;border:1px solid rgba(26,26,46,0.08);display:flex;align-items:flex-end;padding:6px;gap:4px;">
                     <div style="width:22px;height:6px;background:{fg};opacity:0.4;border-radius:1px;"></div>
                     <div style="width:14px;height:6px;background:{fg};opacity:0.6;border-radius:1px;"></div>
@@ -175,8 +164,8 @@
                   <div style="font-size:13.5px;font-weight:500;">{label}</div>
                   <div style="font-size:12px;color:#888899;margin-top:2px;">{desc}</div>
                 </div>
-                <button onclick={() => setter(!val)} style="width:38px;height:22px;border-radius:11px;background:{val ? '#e94560' : 'rgba(26,26,46,0.20)'};border:none;cursor:pointer;position:relative;transition:background 0.2s;">
-                  <div style="position:absolute;top:2px;left:{val ? '18px' : '2px'};width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left 0.2s;"></div>
+                <button disabled title={STUB_TITLE} style="width:38px;height:22px;border-radius:11px;background:rgba(26,26,46,0.20);border:none;cursor:not-allowed;position:relative;opacity:0.6;">
+                  <div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
                 </button>
               </div>
             {/each}
@@ -194,7 +183,7 @@
                 <div style="font-size:13.5px;font-weight:600;">Alle Notizen exportieren</div>
                 <div style="font-size:12px;color:#888899;margin-top:2px;">ZIP-Archiv mit Markdown-Dateien</div>
               </div>
-              <button style="height:38px;padding:0 16px;border:none;border-radius:8px;background:#1a1a2e;color:#fff;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;">
+              <button disabled title={STUB_TITLE} style="height:38px;padding:0 16px;border:none;border-radius:8px;background:#888899;color:#fff;font-weight:600;font-size:13px;cursor:not-allowed;font-family:inherit;display:flex;align-items:center;gap:7px;opacity:0.7;">
                 <Icon name="download" size={14} color="#fff" /> .zip herunterladen
               </button>
             </div>
@@ -204,8 +193,8 @@
                 <div style="font-size:13.5px;font-weight:500;">Automatisches Backup</div>
                 <div style="font-size:12px;color:#888899;margin-top:2px;">Wöchentlich auf verbundenen Cloud-Speicher.</div>
               </div>
-              <button onclick={() => autoBackup = !autoBackup} style="width:38px;height:22px;border-radius:11px;background:{autoBackup ? '#e94560' : 'rgba(26,26,46,0.20)'};border:none;cursor:pointer;position:relative;transition:background 0.2s;">
-                <div style="position:absolute;top:2px;left:{autoBackup ? '18px' : '2px'};width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:left 0.2s;"></div>
+              <button disabled title={STUB_TITLE} style="width:38px;height:22px;border-radius:11px;background:rgba(26,26,46,0.20);border:none;cursor:not-allowed;position:relative;opacity:0.6;">
+                <div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
               </button>
             </div>
           </div>
@@ -218,12 +207,12 @@
             <div style="font-size:13.5px;font-weight:600;color:#e94560;">Konto löschen</div>
             <div style="font-size:12px;color:#888899;margin-top:2px;">Endgültig — alle Notizen und Backlinks werden gelöscht.</div>
           </div>
-          <button style="height:34px;padding:0 14px;border:1px solid rgba(233,69,96,0.40);background:#fff;color:#e94560;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">Löschen</button>
+          <button disabled title={STUB_TITLE} style="height:34px;padding:0 14px;border:1px solid rgba(233,69,96,0.20);background:#fff;color:#888899;border-radius:7px;font-size:12.5px;font-weight:600;cursor:not-allowed;font-family:inherit;opacity:0.6;">Löschen</button>
         </div>
 
         <div style="height:16px;"></div>
 
-        <button onclick={logout} style="width:100%;height:42px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;color:#1a1a2e;font-weight:600;font-size:13.5px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <button onclick={handleLogout} style="width:100%;height:42px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;color:#1a1a2e;font-weight:600;font-size:13.5px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">
           <Icon name="arrowRight" size={15} /> Abmelden
         </button>
 

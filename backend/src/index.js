@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import authRouter from './routes/auth.js';
+import notesRouter from './routes/notes.js';
+import foldersRouter from './routes/folders.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -11,9 +13,18 @@ app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
-
-// Weitere Routen werden in KW 22/23 eingebunden sobald implementiert
+app.use('/api/notes', notesRouter);
+app.use('/api/folders', foldersRouter);
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+
+// 404 für unbekannte API-Routen
+app.use((_req, res) => res.status(404).json({ error: 'Not Found' }));
+
+// Zentraler Error-Handler: verhindert Stack-Trace-Leaks im Response
+app.use((err, _req, res, _next) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
 
 const server = createServer(app);
 server.listen(port, () => {

@@ -13,6 +13,7 @@
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (loading) return;
     if (password.length < 8) {
       validationError = 'Passwort muss mindestens 8 Zeichen lang sein.';
       return;
@@ -22,7 +23,7 @@
       return;
     }
     validationError = '';
-    onsubmit({ username, email, password });
+    onsubmit({ username: username.trim(), email: email.trim(), password });
   }
 
   const displayError = $derived(validationError || error);
@@ -40,6 +41,7 @@
         placeholder="max.notiz"
         class="register-form-input"
         required
+        autocomplete="username"
       />
     </div>
   </div>
@@ -55,6 +57,7 @@
         placeholder="max@zettl.de"
         class="register-form-input"
         required
+        autocomplete="email"
       />
     </div>
   </div>
@@ -70,8 +73,15 @@
         placeholder="••••••••••"
         class="register-form-input"
         required
+        autocomplete="new-password"
       />
-      <button type="button" class="register-form-pw-toggle" onclick={() => showPw = !showPw}>
+      <button
+        type="button"
+        class="register-form-pw-toggle"
+        onclick={() => showPw = !showPw}
+        aria-label={showPw ? 'Passwort verbergen' : 'Passwort anzeigen'}
+        aria-pressed={showPw}
+      >
         <Icon name={showPw ? 'eyeOff' : 'eye'} size={16} color="#888899" />
       </button>
     </div>
@@ -88,6 +98,7 @@
         placeholder="••••••••••"
         class="register-form-input"
         required
+        autocomplete="new-password"
       />
     </div>
   </div>

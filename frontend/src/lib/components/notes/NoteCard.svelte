@@ -1,5 +1,7 @@
 <script>
   import Icon from '$lib/components/ui/Icon.svelte';
+  import { escapeHtml } from '$lib/utils/markdown.js';
+  import { formatDate } from '$lib/utils/date.js';
 
   let { note, selected = false, onclick = () => {} } = $props();
 
@@ -13,8 +15,11 @@
   let color = $derived(note.color || folderColors[note.folder] || '#7c9eb2');
 
   function renderPreview(text) {
-    // [[Note]]-Links hervorheben
-    return text?.replace(/\[\[([^\]]+)\]\]/g, '<span style="color:#e94560;font-weight:500;background:rgba(233,69,96,0.08);padding:0 3px;border-radius:3px;">$1</span>') || '';
+    if (!text) return '';
+    const escaped = escapeHtml(text);
+    return escaped.replace(/\[\[([^\]]+)\]\]/g,
+      '<span style="color:#e94560;font-weight:500;background:rgba(233,69,96,0.08);padding:0 3px;border-radius:3px;">$1</span>'
+    );
   }
 </script>
 
@@ -32,9 +37,9 @@
   <!-- Header: Ordner + Datum -->
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
     <div style="width:6px;height:6px;border-radius:3px;background:{color};flex-shrink:0;"></div>
-    <span style="font-size:11px;color:#888899;font-weight:500;">{note.folder}</span>
+    <span style="font-size:11px;color:#888899;font-weight:500;">{note.folder || 'Notizen'}</span>
     <span style="flex:1;"></span>
-    <span style="font-size:11px;color:#888899;">{note.date || note.updated_at || ''}</span>
+    <span style="font-size:11px;color:#888899;">{formatDate(note.updated_at)}</span>
   </div>
 
   <!-- Titel -->
@@ -43,7 +48,7 @@
   <!-- Vorschau -->
   <div
     style="font-size:12.5px;color:#6b6b80;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;"
-  ><!-- svelte-ignore html_no_interpolate_html -->
+  >
     {@html renderPreview(note.preview || note.content?.slice(0, 120) || '')}
   </div>
 

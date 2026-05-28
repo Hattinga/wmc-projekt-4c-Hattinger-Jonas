@@ -11,7 +11,6 @@
   let autocompleteFilter = $state('');
   let wordCount = $derived(content.trim().split(/\s+/).filter(Boolean).length);
 
-  // [[Note]]-Autocomplete Vorschläge
   let suggestions = $derived(
     autocompleteFilter
       ? notes.filter(n => n.title.toLowerCase().includes(autocompleteFilter.toLowerCase())).slice(0, 6)
@@ -22,7 +21,6 @@
 
   function onInput(e) {
     content = e.currentTarget.value;
-    // Prüfe ob gerade [[... getippt wird
     const pos = e.currentTarget.selectionStart;
     const before = content.slice(0, pos);
     const match = before.match(/\[\[([^\]]+)$/);
@@ -39,16 +37,25 @@
     const pos = textarea.selectionStart;
     const before = content.slice(0, pos);
     const after = content.slice(pos);
-    // Ersetze das offene [[ mit dem vollständigen Link
     const newBefore = before.replace(/\[\[([^\]]+)$/, `[[${noteTitle}]]`);
     content = newBefore + after;
     autocompleteOpen = false;
     autocompleteFilter = '';
-    textarea.focus();
+    // Cursor nach dem eingefügten Link setzen
+    const newPos = newBefore.length;
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newPos, newPos);
+    }, 0);
   }
 
   function handleKeydown(e) {
     if (e.key === 'Escape') autocompleteOpen = false;
+  }
+
+  function closeAutocomplete() {
+    autocompleteOpen = false;
+    autocompleteFilter = '';
   }
 
   export function applyFormat(tool) {
@@ -57,18 +64,25 @@
     const end = textarea.selectionEnd;
     const selected = content.slice(start, end);
     let newContent = content;
-    let cursorOffset = 0;
+    let newCursorStart = start;
+    let newCursorEnd = end;
 
     if (tool.syntax) {
       const wrapped = `${tool.syntax}${selected || 'Text'}${tool.syntax}`;
       newContent = content.slice(0, start) + wrapped + content.slice(end);
-      cursorOffset = tool.syntax.length;
+      newCursorStart = start + tool.syntax.length;
+      newCursorEnd = newCursorStart + (selected || 'Text').length;
     } else if (tool.prefix) {
       const lineStart = content.lastIndexOf('\n', start - 1) + 1;
       newContent = content.slice(0, lineStart) + tool.prefix + content.slice(lineStart);
-      cursorOffset = tool.prefix.length;
+      newCursorStart = start + tool.prefix.length;
+      newCursorEnd = newCursorStart;
     }
     content = newContent;
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newCursorStart, newCursorEnd);
+    }, 0);
   }
 
   export function insertLinkSyntax() {
@@ -77,6 +91,10 @@
     content = content.slice(0, pos) + '[[' + content.slice(pos);
     autocompleteOpen = true;
     autocompleteFilter = '';
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(pos + 2, pos + 2);
+    }, 0);
   }
 </script>
 
@@ -96,6 +114,7 @@
       value={content}
       oninput={onInput}
       onkeydown={handleKeydown}
+      onblur={closeAutocomplete}
       spellcheck="true"
       style="width:100%;height:100%;border:none;outline:none;resize:none;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:13px;line-height:1.65;color:#1a1a2e;background:transparent;box-sizing:border-box;"
     ></textarea>
@@ -106,7 +125,7 @@
         <div style="font-size:10.5px;font-weight:600;color:#888899;padding:6px 10px;letter-spacing:0.5px;text-transform:uppercase;">Notiz einfügen</div>
         {#each suggestions as note, i}
           <button
-            onclick={() => insertLink(note.title)}
+            onmousedown={(e) => { e.preventDefault(); insertLink(note.title); }}
             style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:5px;cursor:pointer;background:{i === 0 ? 'rgba(233,69,96,0.08)' : 'transparent'};border:none;width:100%;font-family:inherit;text-align:left;"
           >
             <Icon name="fileText" size={13} color={note.color || '#7c9eb2'} />
@@ -131,7 +150,6 @@
   </div>
   <div style="flex:1;overflow:auto;padding:24px 32px;background:#fafaf8;">
     <div style="max-width:560px;font-size:14.5px;line-height:1.7;color:#1a1a2e;" class="prose">
-      <!-- svelte-ignore html_no_interpolate_html -->
       {@html renderedHtml}
     </div>
   </div>

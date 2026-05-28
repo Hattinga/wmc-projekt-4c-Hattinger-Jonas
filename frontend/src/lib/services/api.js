@@ -1,6 +1,8 @@
 // REST-API Fetch-Wrapper
 // Liest JWT aus localStorage, setzt Authorization-Header automatisch.
 
+import { goto } from '$app/navigation';
+
 const BASE = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000/api';
 
 function getToken() {
@@ -13,16 +15,34 @@ async function request(method, path, body) {
   const token = getToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${BASE}${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-  });
+  let res;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    throw new Error('Netzwerkfehler – keine Verbindung zum Server.');
+  }
+
+  // Abgelaufenes/ungültiges Token → ausloggen und weiterleiten
+  if (res.status === 401) {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('zw-token');
+      localStorage.removeItem('zw-user');
+    }
+    goto('/auth');
+    throw new Error('Sitzung abgelaufen. Bitte erneut anmelden.');
+  }
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
     throw new Error(err.error || err.message || `HTTP ${res.status}`);
   }
+
+  // 204 No Content (z.B. DELETE)
+  if (res.status === 204) return null;
   return res.json();
 }
 

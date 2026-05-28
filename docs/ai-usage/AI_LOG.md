@@ -117,5 +117,18 @@
 - **Ergebnis:** Auth-Flow fachlich nachgezogen; JWT-Struktur und Bearer-Weitergabe klar eingeordnet
 - **Integration:** Diente als Absicherung der bereits implementierten JWT-Middleware und als Grundlage für die Präsentation
 
-### 
+### Session 10 – 28.05.2026
+- **Tool:** Claude Code (CLI) — /batch Audit + /plan Bug-Fix-Sweep
+- **Zweck:** 59 Audit-Funde aus KW 21/22 Code beheben (Critical, High, Medium, Low)
+- **Prompt (Zusammenfassung):** `/batch` → paralleles Audit-Team durchsucht Front- und Backend; Ergebnis: 59 Funde gemeldet. `/plan fixe das alles` → alle 59 Funde in einem Sweep implementiert ohne Commits.
+- **Umgesetzte Änderungen:**
+  - **Critical:** Rekursiver SQLite-Trigger behoben (`AFTER UPDATE OF title,content,folder_id` verhindert Rekursion); XSS in Markdown-Preview + Dashboard-Preview via Escape-Pipeline mit `\x00N\x00`-Platzhaltern (Code-Blöcke + Wiki-Links werden vor dem Escaping extrahiert); Autosave-Race bei Note-Wechsel behoben (ID-Snapshot + Closure-Vergleich + `$effect`-Cleanup)
+  - **High (Backend):** Kein zentraler Error-Handler/404 → ergänzt; `JWT_SECRET`-Fehlt-Check beim Modul-Load; leere Eingaben (title/name) → 400-Validierung; E-Mail-Format-Validierung; `folder_id`-Ownership-Check in Notes-Routen; `CIRCULAR`-Parent-Erkennung in Folder-Update; dynamisches SQL für null-fähige `folder_id`/`parent_id`-Updates
+  - **High (Frontend):** 401-Auto-Logout zentral in `api.js` (`goto('/auth')`); Network-Error-Wrapping; Auth-Guard ohne Flash (synchrones `$derived` statt `$effect`); Autosave-Fehler sichtbar; Load-Error nur bei 404 weiterleiten
+  - **Medium:** Cross-Tab-Logout-Sync (`storage`-Event); `logout()`-Helper im Store; FAB-Double-Submit-Guard; `selectedId`-Invalidierung nach Löschen; null-sichere Sortierung/Suche; `formatDate`-Util (neue Datei `date.js`); Sidebar `$effect` auf primitiver `userId`; Quick-Link-Counts entfernt (bis echte API); Settings-Stubs `disabled`
+  - **Low:** Case-insensitive Wiki-Link-Matching; `encodeURIComponent` in Link-hrefs; `extractLinks` normalisiert; BacklinksPanel XSS-safe; i18n-Key-Fallback; `escapeHtml` exportiert und geteilt; 4 DB-Indizes ergänzt; `DROP TRIGGER IF EXISTS` für idempotentes Bootstrap; Autocomplete schließt bei Blur; Format-Cursor korrekt gesetzt; Inputs getrimmt; `aria-label`/`aria-pressed` an PW-Toggles
+- **Neue Datei:** `frontend/src/lib/utils/date.js` — gemeinsame `formatDate(iso)`-Util
+- **Verifiziert:** `npm run build` → ✓ built in 14.53s (nur pre-existing a11y-Warnings)
+- **Integration:** Alles nochmal gecheckt und danach verfiziert durch tests 
+
 <!-- Weitere Sessions hier anhängen -->

@@ -11,7 +11,8 @@
 
   function handleSubmit(e) {
     e.preventDefault();
-    onsubmit({ email, password, rememberMe });
+    if (loading) return;
+    onsubmit({ email: email.trim(), password, rememberMe });
   }
 </script>
 
@@ -27,6 +28,7 @@
         placeholder="max@zettl.de"
         class="login-form-input"
         required
+        autocomplete="email"
       />
     </div>
   </div>
@@ -42,8 +44,15 @@
         placeholder="••••••••••"
         class="login-form-input"
         required
+        autocomplete="current-password"
       />
-      <button type="button" class="login-form-pw-toggle" onclick={() => showPw = !showPw}>
+      <button
+        type="button"
+        class="login-form-pw-toggle"
+        onclick={() => showPw = !showPw}
+        aria-label={showPw ? 'Passwort verbergen' : 'Passwort anzeigen'}
+        aria-pressed={showPw}
+      >
         <Icon name={showPw ? 'eyeOff' : 'eye'} size={16} color="#888899" />
       </button>
     </div>

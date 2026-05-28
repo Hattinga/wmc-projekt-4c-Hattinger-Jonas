@@ -1,6 +1,7 @@
 <script>
   import Icon from '$lib/components/ui/Icon.svelte';
   import { goto } from '$app/navigation';
+  import { escapeHtml } from '$lib/utils/markdown.js';
 
   let { backlinks = [], noteId = '' } = $props();
   let open = $state(true);
@@ -11,7 +12,11 @@
   };
 
   function renderPreview(text) {
-    return text?.replace(/\[\[([^\]]+)\]\]/g, '<span style="color:#e94560;font-weight:500;">$1</span>') || '';
+    if (!text) return '';
+    const escaped = escapeHtml(text);
+    return escaped.replace(/\[\[([^\]]+)\]\]/g,
+      '<span style="color:#e94560;font-weight:500;">$1</span>'
+    );
   }
 </script>
 
@@ -50,7 +55,6 @@
           </div>
           <div style="font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:4px;">{note.title}</div>
           <div style="font-size:11.5px;color:#6b6b80;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
-            <!-- svelte-ignore html_no_interpolate_html -->
             {@html renderPreview(note.preview || note.content?.slice(0, 80) || '')}
           </div>
         </button>

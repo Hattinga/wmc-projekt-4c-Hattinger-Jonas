@@ -13,4 +13,24 @@ export const appState = $state({
   locale: loadFromStorage('zw-locale', 'de'),
   searchQuery: '',
   currentUser: loadFromStorage('zw-user', null),
+  folders: [],
+  tags: [],
 });
+
+/** Zentraler Logout-Helper – räumt Token, User und State auf. */
+export function logout() {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.removeItem('zw-token');
+    localStorage.removeItem('zw-user');
+  }
+  appState.currentUser = null;
+}
+
+// Cross-Tab-Sync: Logout in Tab B wird in Tab A erkannt
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'zw-token' && e.newValue === null) {
+      appState.currentUser = null;
+    }
+  });
+}

@@ -3,31 +3,60 @@
   import Icon from '$lib/components/ui/Icon.svelte';
   import NoteCard from '$lib/components/notes/NoteCard.svelte';
   import { appState } from '$lib/stores/appState.svelte.js';
+  import { escapeHtml } from '$lib/utils/markdown.js';
+  import { formatDate } from '$lib/utils/date.js';
+  import * as api from '$lib/services/api.js';
 
-  const DEMO_NOTES = [
-    { id: 'svelte-5-runes', title: 'Svelte 5 Runes', folder: 'Entwicklung', color: '#4ea8de', preview: '$state, $derived und $effect ersetzen die alten Reactive Statements. Migration von [[Projektmanagement]]-Tool läuft…', date: 'Heute, 11:08', tags: ['svelte', 'frontend', 'reactivity'], backlinks: 7, updated_at: new Date().toISOString() },
-    { id: 'projektmanagement', title: 'Projektmanagement', folder: 'Arbeit', color: '#e94560', preview: 'Sprint-Planung mit Pair-Programming-Slots. Diskussion mit [[Express.js API]]-Team über Velocity-Anpassung nach Q3…', date: 'Heute, 14:32', tags: ['arbeit', 'sprint', 'scrum'], backlinks: 4, updated_at: new Date(Date.now() - 3600000).toISOString() },
-    { id: 'express-js-api', title: 'Express.js API', folder: 'Entwicklung', color: '#4ea8de', preview: 'Middleware-Reihenfolge: helmet → cors → bodyParser → routes → errorHandler. Auth via JWT, siehe [[Svelte 5 Runes]] Client.', date: 'Gestern, 19:44', tags: ['backend', 'node', 'api'], backlinks: 5, updated_at: new Date(Date.now() - 86400000).toISOString() },
-    { id: 'bi-direktionale-links', title: 'Bi-direktionale Links', folder: 'Notizen', color: '#7c9eb2', preview: 'Jede [[Notiz]] kennt ihre Eltern und Kinder. Backlinks sind keine Pflicht — sie sind ein Nebenprodukt sauberer Verlinkung.', date: 'So, 22:01', tags: ['theorie', 'zettelkasten'], backlinks: 11, updated_at: new Date(Date.now() - 172800000).toISOString() },
-  ];
-
-  let selectedId = $state(DEMO_NOTES[0].id);
+  let notes = $state([]);
+  let selectedId = $state(null);
   let sortBy = $state('updated');
   let langOpen = $state(false);
+  let creating = $state(false);
 
-  let selectedNote = $derived(DEMO_NOTES.find(n => n.id === selectedId));
-  let sortedNotes = $derived([...DEMO_NOTES].sort((a, b) => {
-    if (sortBy === 'alpha') return a.title.localeCompare(b.title);
+  $effect(() => {
+    api.getNotes().then(r => {
+      notes = r.notes ?? [];
+      // Wenn selectedId nicht mehr existiert, zurücksetzen
+      if (selectedId !== null && !notes.find(n => n.id === selectedId)) {
+        selectedId = notes.length > 0 ? notes[0].id : null;
+      } else if (selectedId === null && notes.length > 0) {
+        selectedId = notes[0].id;
+      }
+    }).catch(() => {});
+  });
+
+  let selectedNote = $derived(notes.find(n => n.id === selectedId));
+  let sortedNotes = $derived([...notes].sort((a, b) => {
+    if (sortBy === 'alpha') return (a.title ?? '').localeCompare(b.title ?? '');
     return new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
   }));
   let filteredNotes = $derived(
     appState.searchQuery
-      ? sortedNotes.filter(n => n.title.toLowerCase().includes(appState.searchQuery.toLowerCase()) || n.preview?.toLowerCase().includes(appState.searchQuery.toLowerCase()))
+      ? sortedNotes.filter(n =>
+          (n.title ?? '').toLowerCase().includes(appState.searchQuery.toLowerCase()) ||
+          n.content?.toLowerCase().includes(appState.searchQuery.toLowerCase())
+        )
       : sortedNotes
   );
 
+  async function createNote() {
+    if (creating) return;
+    creating = true;
+    try {
+      const r = await api.createNote({ title: 'Neue Notiz', content: '' });
+      goto(`/note/${r.note.id}`);
+    } finally {
+      creating = false;
+    }
+  }
+
   function formatWikiLinks(text) {
-    return text?.replace(/\[\[([^\]]+)\]\]/g, '<span style="color:#e94560;font-weight:500;background:rgba(233,69,96,0.08);padding:0 3px;border-radius:3px;">$1</span>') || '';
+    if (!text) return '';
+    // Erst escapen, dann nur [[Wiki-Link]]-Spans einfügen
+    const escaped = escapeHtml(text);
+    return escaped.replace(/\[\[([^\]]+)\]\]/g,
+      '<span style="color:#e94560;font-weight:500;background:rgba(233,69,96,0.08);padding:0 3px;border-radius:3px;">$1</span>'
+    );
   }
 </script>
 
@@ -75,7 +104,7 @@
       </div>
       <!-- Avatar -->
       <div style="width:34px;height:34px;border-radius:17px;background:linear-gradient(135deg,#1a1a2e,#2d2d4a);color:#fff;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;" onclick={() => goto('/settings')}>
-        MN
+        {(appState.currentUser?.username || 'U').slice(0, 2).toUpperCase()}
       </div>
     </div>
 
@@ -103,7 +132,9 @@
             <NoteCard {note} selected={note.id === selectedId} onclick={() => selectedId = note.id} />
           {/each}
           {#if filteredNotes.length === 0}
-            <div style="padding:32px 16px;text-align:center;color:#888899;font-size:13px;">Keine Notizen gefunden.</div>
+            <div style="padding:32px 16px;text-align:center;color:#888899;font-size:13px;">
+              {notes.length === 0 ? 'Noch keine Notizen. Erstelle deine erste Notiz!' : 'Keine Notizen gefunden.'}
+            </div>
           {/if}
         </div>
       </div>
@@ -114,9 +145,9 @@
           <div style="max-width:640px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
               <div style="width:8px;height:8px;border-radius:4px;background:{selectedNote.color || '#7c9eb2'};"></div>
-              <span style="font-size:12px;color:#888899;font-weight:500;">{selectedNote.folder}</span>
+              <span style="font-size:12px;color:#888899;font-weight:500;">{selectedNote.folder || 'Notizen'}</span>
               <span style="color:#cccfd7;">·</span>
-              <span style="font-size:12px;color:#888899;">{selectedNote.date}</span>
+              <span style="font-size:12px;color:#888899;">{formatDate(selectedNote.updated_at)}</span>
               <span style="flex:1;"></span>
               <button onclick={() => goto(`/note/${selectedNote.id}`)} style="height:32px;padding:0 12px;border:none;border-radius:8px;background:#e94560;color:#fff;font-weight:600;font-size:12px;cursor:pointer;font-family:inherit;">Öffnen</button>
               <button style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;"><Icon name="share" size={14} /></button>
@@ -126,23 +157,27 @@
             {#if selectedNote.tags?.length}
               <div style="display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;">
                 {#each selectedNote.tags as tag}
-                  <span style="font-size:11.5px;padding:3px 9px;border-radius:12px;background:#fff;border:1px solid rgba(26,26,46,0.10);color:#6b6b80;font-weight:500;">#{tag}</span>
+                  <span style="font-size:11.5px;padding:3px 9px;border-radius:12px;background:#fff;border:1px solid rgba(26,26,46,0.10);color:#6b6b80;font-weight:500;">#{typeof tag === 'string' ? tag : tag.name}</span>
                 {/each}
               </div>
             {/if}
             <div style="font-size:14.5px;line-height:1.65;color:#1a1a2e;">
-              <!-- svelte-ignore html_no_interpolate_html -->
-              {@html formatWikiLinks(selectedNote.preview)}
+              {@html formatWikiLinks(selectedNote.content?.slice(0, 300))}
             </div>
             <div style="margin-top:28px;padding:16px;background:#fff;border:1px solid rgba(26,26,46,0.08);border-radius:10px;">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
                 <Icon name="link2" size={14} color="#e94560" />
-                <span style="font-size:12.5px;font-weight:600;color:#1a1a2e;">{selectedNote.backlinks} Backlinks</span>
+                <span style="font-size:12.5px;font-weight:600;color:#1a1a2e;">{selectedNote.backlinks ?? 0} Backlinks</span>
               </div>
               {#if !selectedNote.backlinks}
                 <div style="font-size:12px;color:#888899;">Keine Notizen verlinken hierher.</div>
               {/if}
             </div>
+          </div>
+        {:else if notes.length === 0}
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#888899;gap:12px;">
+            <Icon name="penLine" size={32} color="#cccfd7" />
+            <p style="margin:0;font-size:14px;">Erstelle deine erste Notiz mit dem + Button.</p>
           </div>
         {/if}
       </div>
@@ -151,10 +186,11 @@
 
   <!-- FAB -->
   <button
-    onclick={() => goto('/note/svelte-5-runes')}
-    style="position:fixed;bottom:28px;right:28px;height:48px;padding:0 18px 0 14px;border:none;border-radius:24px;background:#e94560;color:#fff;font-weight:600;font-size:13.5px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;box-shadow:0 6px 22px rgba(233,69,96,0.40),0 2px 6px rgba(233,69,96,0.20);z-index:5;"
+    onclick={createNote}
+    disabled={creating}
+    style="position:fixed;bottom:28px;right:28px;height:48px;padding:0 18px 0 14px;border:none;border-radius:24px;background:{creating ? '#c4384f' : '#e94560'};color:#fff;font-weight:600;font-size:13.5px;cursor:{creating ? 'not-allowed' : 'pointer'};font-family:inherit;display:flex;align-items:center;gap:8px;box-shadow:0 6px 22px rgba(233,69,96,0.40),0 2px 6px rgba(233,69,96,0.20);z-index:5;"
   >
     <Icon name="plus" size={18} color="#fff" strokeWidth={2.4} />
-    Neue Notiz
+    {creating ? '…' : 'Neue Notiz'}
   </button>
 </div>
