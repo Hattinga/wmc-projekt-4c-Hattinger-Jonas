@@ -29,6 +29,9 @@
       api.getFolders().then(r => {
         appState.folders = buildTree(r.folders ?? []);
       }).catch(() => {});
+      api.getTags().then(r => {
+        appState.tags = r.tags ?? [];
+      }).catch(() => {});
     }
   });
 

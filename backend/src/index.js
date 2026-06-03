@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import authRouter from './routes/auth.js';
 import notesRouter from './routes/notes.js';
 import foldersRouter from './routes/folders.js';
+import tagsRouter from './routes/tags.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/notes', notesRouter);
 app.use('/api/folders', foldersRouter);
+app.use('/api/tags', tagsRouter);
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
 // 404 für unbekannte API-Routen
