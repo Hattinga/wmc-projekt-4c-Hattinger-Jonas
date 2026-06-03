@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import Sidebar from '$lib/components/layout/Sidebar.svelte';
+  import { connectWs, disconnectWs } from '$lib/services/websocket.js';
 
   let { children } = $props();
 
@@ -16,6 +17,14 @@
   $effect(() => {
     if (!isPublicRoute && !hasToken) {
       goto('/auth');
+    }
+  });
+
+  $effect(() => {
+    if (hasToken) {
+      connectWs();
+    } else {
+      disconnectWs();
     }
   });
 </script>

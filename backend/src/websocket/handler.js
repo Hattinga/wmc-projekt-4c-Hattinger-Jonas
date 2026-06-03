@@ -1,7 +1,25 @@
-// TODO: Socket.io Event-Handler.
-// Wird beim Server-Start mit der io-Instanz initialisiert.
-// Events:
-//   connection    – JWT aus handshake.auth verifizieren; bei Fehler disconnect
-//   disconnect    – Logging
-// Exportiert emitNoteUpdated(io, userId, note) und emitNoteDeleted(io, userId, noteId)
-// für Aufruf aus den REST-Routen nach erfolgreichem Save/Delete.
+import jwt from 'jsonwebtoken';
+
+export function initWebSocket(io) {
+  io.on('connection', (socket) => {
+    const token = socket.handshake.auth?.token;
+    if (!token) {
+      socket.disconnect(true);
+      return;
+    }
+    try {
+      const user = jwt.verify(token, process.env.JWT_SECRET);
+      socket.join(`user:${user.id}`);
+    } catch {
+      socket.disconnect(true);
+    }
+  });
+}
+
+export function emitNoteUpdated(io, userId, note) {
+  io.to(`user:${userId}`).emit('note:updated', note);
+}
+
+export function emitNoteDeleted(io, userId, noteId) {
+  io.to(`user:${userId}`).emit('note:deleted', noteId);
+}

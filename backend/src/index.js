@@ -2,18 +2,28 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
+import { Server } from 'socket.io';
 import authRouter from './routes/auth.js';
-import notesRouter from './routes/notes.js';
+import createNotesRouter from './routes/notes.js';
 import foldersRouter from './routes/folders.js';
+import { initWebSocket } from './websocket/handler.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
+const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
+app.use(cors({ origin: frontendUrl }));
 app.use(express.json());
 
+const server = createServer(app);
+
+const io = new Server(server, {
+  cors: { origin: frontendUrl },
+});
+initWebSocket(io);
+
 app.use('/api/auth', authRouter);
-app.use('/api/notes', notesRouter);
+app.use('/api/notes', createNotesRouter(io));
 app.use('/api/folders', foldersRouter);
 app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
@@ -26,7 +36,6 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
-const server = createServer(app);
 server.listen(port, () => {
   console.log(`Server läuft auf Port ${port}`);
 });

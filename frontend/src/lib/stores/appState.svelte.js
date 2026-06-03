@@ -15,6 +15,8 @@ export const appState = $state({
   currentUser: loadFromStorage('zw-user', null),
   folders: [],
   tags: [],
+  notes: [],
+  wsConnected: false,
 });
 
 /** Zentraler Logout-Helper – räumt Token, User und State auf. */
