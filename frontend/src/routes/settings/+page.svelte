@@ -3,24 +3,112 @@
   import Icon from '$lib/components/ui/Icon.svelte';
   import { appState, logout } from '$lib/stores/appState.svelte.js';
   import { setLocale } from '$lib/i18n/index.js';
+  import * as api from '$lib/services/api.js';
 
   let activeSection = $state('profil');
-  let theme = $state('light');
 
-  // Formfelder
-  let username = $state(appState.currentUser?.username || 'max.notiz');
-  let displayName = $state(appState.currentUser?.displayName || 'Max Notiz');
-  let email = $state(appState.currentUser?.email || 'max@zettlwirtschaft.de');
-  let bio = $state('Frontend-Entwickler, Zettelkasten-Fan, schreibt am liebsten morgens.');
+  // Theme — persisted in localStorage
+  let theme = $state(
+    (typeof localStorage !== 'undefined' ? localStorage.getItem('zw-theme') : null) || 'system'
+  );
+
+  $effect(() => {
+    if (typeof document === 'undefined') return;
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('zw-theme', theme);
+  });
+
+  // Profile fields
+  let username = $state(appState.currentUser?.username || '');
+  let email = $state(appState.currentUser?.email || '');
+
+  let profileSaving = $state(false);
+  let profileError = $state('');
+  let profileSaved = $state(false);
+  let profileSavedTimer = 0;
+
+  async function saveProfile() {
+    profileError = '';
+    profileSaved = false;
+    profileSaving = true;
+    try {
+      const result = await api.updateMe({ username, email });
+      appState.currentUser = result.user;
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('zw-user', JSON.stringify(result.user));
+      }
+      profileSaved = true;
+      clearTimeout(profileSavedTimer);
+      profileSavedTimer = setTimeout(() => { profileSaved = false; }, 3000);
+    } catch (err) {
+      profileError = err.message;
+    } finally {
+      profileSaving = false;
+    }
+  }
+
+  // Password fields
   let currentPassword = $state('');
   let newPassword = $state('');
   let newPasswordConfirm = $state('');
-  let twoFactor = $state(false);
+
+  let passwordSaving = $state(false);
+  let passwordError = $state('');
+  let passwordSaved = $state(false);
+  let passwordSavedTimer = 0;
+
+  async function changePassword() {
+    passwordError = '';
+    passwordSaved = false;
+
+    if (!currentPassword) {
+      passwordError = 'Bitte das aktuelle Passwort eingeben.';
+      return;
+    }
+    if (newPassword.length < 8) {
+      passwordError = 'Neues Passwort muss mindestens 8 Zeichen haben.';
+      return;
+    }
+    if (newPassword !== newPasswordConfirm) {
+      passwordError = 'Neue Passwörter stimmen nicht überein.';
+      return;
+    }
+
+    passwordSaving = true;
+    try {
+      await api.updateMe({ password: newPassword, currentPassword });
+      passwordSaved = true;
+      currentPassword = '';
+      newPassword = '';
+      newPasswordConfirm = '';
+      clearTimeout(passwordSavedTimer);
+      passwordSavedTimer = setTimeout(() => { passwordSaved = false; }, 3000);
+    } catch (err) {
+      passwordError = err.message;
+    } finally {
+      passwordSaving = false;
+    }
+  }
+
   let compactMode = $state(false);
   let animations = $state(true);
-  let autoBackup = $state(true);
 
-  const STUB_TITLE = 'In KW 23 verfügbar';
+  function handleDeleteAccount() {
+    const confirmed = confirm(
+      'Konto wirklich löschen? Alle Notizen und Backlinks werden unwiderruflich entfernt.'
+    );
+    if (!confirmed) return;
+    alert('Konto löschen ist noch nicht implementiert.');
+  }
+
+  function handleLogout() {
+    logout();
+    goto('/auth');
+  }
 
   const sections = [
     { id: 'profil', ic: 'user', label: 'Profil' },
@@ -30,11 +118,6 @@
     { id: 'export', ic: 'download', label: 'Export & Backup' },
     { id: 'benachrichtigungen', ic: 'bell', label: 'Benachrichtigungen' },
   ];
-
-  function handleLogout() {
-    logout();
-    goto('/auth');
-  }
 </script>
 
 <div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:Inter,system-ui,sans-serif;background:#fafaf8;overflow:hidden;color:#1a1a2e;">
@@ -81,28 +164,41 @@
                 {username.slice(0,2).toUpperCase()}
               </div>
               <div>
-                <button disabled title={STUB_TITLE} style="height:34px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:8px;background:#fff;color:#888899;font-weight:500;font-size:12.5px;cursor:not-allowed;font-family:inherit;display:block;margin-bottom:6px;opacity:0.6;">Bild ändern</button>
+                <button disabled style="height:34px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:8px;background:#fff;color:#888899;font-weight:500;font-size:12.5px;cursor:not-allowed;font-family:inherit;display:block;margin-bottom:6px;opacity:0.6;">Bild ändern</button>
                 <span style="font-size:11.5px;color:#888899;">JPG, PNG · max. 2 MB</span>
               </div>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
-              {#each [['Benutzername', username, (v) => username = v, 'text'], ['Anzeigename', displayName, (v) => displayName = v, 'text'], ['E-Mail', email, (v) => email = v, 'email']] as [label, val, setter, type]}
-                <div>
-                  <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">{label}</label>
-                  <input
-                    {type}
-                    value={val}
-                    oninput={(e) => setter(e.currentTarget.value)}
-                    style="width:100%;height:42px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;font-size:13.5px;color:#1a1a2e;font-family:inherit;outline:none;box-sizing:border-box;"
-                  />
-                </div>
-              {/each}
               <div>
-                <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">Über mich</label>
-                <textarea bind:value={bio} style="width:100%;padding:10px 14px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;font-size:13.5px;color:#1a1a2e;font-family:inherit;outline:none;min-height:64px;resize:vertical;box-sizing:border-box;"></textarea>
+                <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">Benutzername</label>
+                <input
+                  type="text"
+                  bind:value={username}
+                  style="width:100%;height:42px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;font-size:13.5px;color:#1a1a2e;font-family:inherit;outline:none;box-sizing:border-box;"
+                />
               </div>
-              <button disabled title={STUB_TITLE} style="height:42px;border:none;border-radius:9px;background:#888899;color:#fff;font-weight:600;font-size:13.5px;cursor:not-allowed;font-family:inherit;opacity:0.7;">Änderungen speichern</button>
+              <div>
+                <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">E-Mail</label>
+                <input
+                  type="email"
+                  bind:value={email}
+                  style="width:100%;height:42px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;font-size:13.5px;color:#1a1a2e;font-family:inherit;outline:none;box-sizing:border-box;"
+                />
+              </div>
+              {#if profileError}
+                <p style="margin:0;font-size:12.5px;color:#e94560;">{profileError}</p>
+              {/if}
+              {#if profileSaved}
+                <p style="margin:0;font-size:12.5px;color:#22c55e;">Profil gespeichert.</p>
+              {/if}
+              <button
+                onclick={saveProfile}
+                disabled={profileSaving}
+                style="height:42px;border:none;border-radius:9px;background:{profileSaving ? '#888899' : '#e94560'};color:#fff;font-weight:600;font-size:13.5px;cursor:{profileSaving ? 'not-allowed' : 'pointer'};font-family:inherit;opacity:{profileSaving ? 0.7 : 1};"
+              >
+                {profileSaving ? 'Wird gespeichert…' : 'Änderungen speichern'}
+              </button>
             </div>
           </div>
 
@@ -117,13 +213,25 @@
                   <input type="password" value={val} oninput={(e) => setter(e.currentTarget.value)} placeholder="••••••••••" style="width:100%;height:42px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;font-size:13.5px;color:#1a1a2e;font-family:inherit;outline:none;box-sizing:border-box;" />
                 </div>
               {/each}
-              <button disabled title={STUB_TITLE} style="height:42px;border:none;border-radius:9px;background:#888899;color:#fff;font-weight:600;font-size:13.5px;cursor:not-allowed;font-family:inherit;opacity:0.7;">Passwort ändern</button>
+              {#if passwordError}
+                <p style="margin:0;font-size:12.5px;color:#e94560;">{passwordError}</p>
+              {/if}
+              {#if passwordSaved}
+                <p style="margin:0;font-size:12.5px;color:#22c55e;">Passwort geändert.</p>
+              {/if}
+              <button
+                onclick={changePassword}
+                disabled={passwordSaving}
+                style="height:42px;border:none;border-radius:9px;background:{passwordSaving ? '#888899' : '#e94560'};color:#fff;font-weight:600;font-size:13.5px;cursor:{passwordSaving ? 'not-allowed' : 'pointer'};font-family:inherit;opacity:{passwordSaving ? 0.7 : 1};"
+              >
+                {passwordSaving ? 'Wird gespeichert…' : 'Passwort ändern'}
+              </button>
               <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid rgba(26,26,46,0.06);">
                 <div style="flex:1;">
                   <div style="font-size:13.5px;font-weight:500;">Zwei-Faktor-Authentifizierung</div>
                   <div style="font-size:12px;color:#888899;margin-top:2px;">Sichere dein Konto mit einer Authenticator-App.</div>
                 </div>
-                <button disabled title={STUB_TITLE} style="width:38px;height:22px;border-radius:11px;background:rgba(26,26,46,0.20);border:none;cursor:not-allowed;position:relative;opacity:0.6;">
+                <button disabled style="width:38px;height:22px;border-radius:11px;background:rgba(26,26,46,0.20);border:none;cursor:not-allowed;position:relative;opacity:0.6;">
                   <div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
                 </button>
               </div>
@@ -146,10 +254,13 @@
         {:else if activeSection === 'darstellung'}
           <div style="margin-bottom:32px;">
             <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">Darstellung</h3>
-            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">Light oder Dark Mode (in KW 23 verfügbar).</p>
+            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">Light oder Dark Mode.</p>
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
               {#each [['light', 'Hell', '#fff', '#1a1a2e'], ['dark', 'Dunkel', '#1a1a2e', '#fff'], ['system', 'System', 'linear-gradient(135deg,#fff 50%,#1a1a2e 50%)', '#1a1a2e']] as [key, label, bg, fg]}
-                <button disabled title={STUB_TITLE} style="width:130px;padding:10px;border-radius:10px;background:#fff;border:2px solid {theme === key ? '#e94560' : 'rgba(26,26,46,0.10)'};cursor:not-allowed;font-family:inherit;text-align:center;opacity:0.7;">
+                <button
+                  onclick={() => theme = key}
+                  style="width:130px;padding:10px;border-radius:10px;background:#fff;border:2px solid {theme === key ? '#e94560' : 'rgba(26,26,46,0.10)'};cursor:pointer;font-family:inherit;text-align:center;"
+                >
                   <div style="height:60px;border-radius:6px;background:{bg};margin-bottom:8px;border:1px solid rgba(26,26,46,0.08);display:flex;align-items:flex-end;padding:6px;gap:4px;">
                     <div style="width:22px;height:6px;background:{fg};opacity:0.4;border-radius:1px;"></div>
                     <div style="width:14px;height:6px;background:{fg};opacity:0.6;border-radius:1px;"></div>
@@ -164,7 +275,7 @@
                   <div style="font-size:13.5px;font-weight:500;">{label}</div>
                   <div style="font-size:12px;color:#888899;margin-top:2px;">{desc}</div>
                 </div>
-                <button disabled title={STUB_TITLE} style="width:38px;height:22px;border-radius:11px;background:rgba(26,26,46,0.20);border:none;cursor:not-allowed;position:relative;opacity:0.6;">
+                <button disabled style="width:38px;height:22px;border-radius:11px;background:rgba(26,26,46,0.20);border:none;cursor:not-allowed;position:relative;opacity:0.6;">
                   <div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
                 </button>
               </div>
@@ -183,7 +294,7 @@
                 <div style="font-size:13.5px;font-weight:600;">Alle Notizen exportieren</div>
                 <div style="font-size:12px;color:#888899;margin-top:2px;">ZIP-Archiv mit Markdown-Dateien</div>
               </div>
-              <button disabled title={STUB_TITLE} style="height:38px;padding:0 16px;border:none;border-radius:8px;background:#888899;color:#fff;font-weight:600;font-size:13px;cursor:not-allowed;font-family:inherit;display:flex;align-items:center;gap:7px;opacity:0.7;">
+              <button disabled style="height:38px;padding:0 16px;border:none;border-radius:8px;background:#888899;color:#fff;font-weight:600;font-size:13px;cursor:not-allowed;font-family:inherit;display:flex;align-items:center;gap:7px;opacity:0.7;">
                 <Icon name="download" size={14} color="#fff" /> .zip herunterladen
               </button>
             </div>
@@ -193,7 +304,7 @@
                 <div style="font-size:13.5px;font-weight:500;">Automatisches Backup</div>
                 <div style="font-size:12px;color:#888899;margin-top:2px;">Wöchentlich auf verbundenen Cloud-Speicher.</div>
               </div>
-              <button disabled title={STUB_TITLE} style="width:38px;height:22px;border-radius:11px;background:rgba(26,26,46,0.20);border:none;cursor:not-allowed;position:relative;opacity:0.6;">
+              <button disabled style="width:38px;height:22px;border-radius:11px;background:rgba(26,26,46,0.20);border:none;cursor:not-allowed;position:relative;opacity:0.6;">
                 <div style="position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
               </button>
             </div>
@@ -207,7 +318,7 @@
             <div style="font-size:13.5px;font-weight:600;color:#e94560;">Konto löschen</div>
             <div style="font-size:12px;color:#888899;margin-top:2px;">Endgültig — alle Notizen und Backlinks werden gelöscht.</div>
           </div>
-          <button disabled title={STUB_TITLE} style="height:34px;padding:0 14px;border:1px solid rgba(233,69,96,0.20);background:#fff;color:#888899;border-radius:7px;font-size:12.5px;font-weight:600;cursor:not-allowed;font-family:inherit;opacity:0.6;">Löschen</button>
+          <button onclick={handleDeleteAccount} style="height:34px;padding:0 14px;border:1px solid rgba(233,69,96,0.40);background:#fff;color:#e94560;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">Löschen</button>
         </div>
 
         <div style="height:16px;"></div>
