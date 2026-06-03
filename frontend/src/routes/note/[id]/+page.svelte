@@ -17,6 +17,7 @@
   let savedAt = $state(null);
   let saveError = $state('');
   let loadError = $state('');
+  let backlinks = $state([]);
   let editorRef;
   let saveTimer = null; // component-local, reset on each note load
 
@@ -26,6 +27,7 @@
     loadError = '';
     saveError = '';
     savedAt = null;
+    backlinks = [];
     clearTimeout(saveTimer);
     api.getNote(id).then(r => {
       note = r.note;
@@ -39,6 +41,7 @@
       }
     });
     api.getNotes().then(r => { allNotes = r.notes ?? []; });
+    api.getNoteBacklinks(id).then(r => { backlinks = r.backlinks ?? []; }).catch(() => {});
   });
 
   // Debounced autosave — 800ms nach letzter Änderung
@@ -58,6 +61,7 @@
         const r = await api.updateNote(currentId, { title: t, content: c });
         note = r.note;
         savedAt = new Date();
+        api.getNoteBacklinks(currentId).then(res => { backlinks = res.backlinks ?? []; }).catch(() => {});
       } catch {
         saveError = 'Speichern fehlgeschlagen.';
       } finally {
@@ -75,8 +79,6 @@
       api.updateNote(note.id, { title, content }).catch(() => {});
     }
   });
-
-  const DEMO_BACKLINKS = [];
 
   function handleFormat(tool) {
     editorRef?.applyFormat(tool);
@@ -157,7 +159,7 @@
   </div>
 
   <!-- Backlinks panel -->
-  <BacklinksPanel backlinks={DEMO_BACKLINKS} {noteId} />
+  <BacklinksPanel {backlinks} {noteId} />
 </div>
 
 <style>

@@ -4,7 +4,10 @@ const stmtFindAll = db.prepare(`
   SELECT n.id, n.title, n.content, n.folder_id,
          n.created_at, n.updated_at,
          f.name AS folder,
-         (SELECT COUNT(*) FROM note_links WHERE target_id = n.id) AS backlinks
+         (SELECT COUNT(*) FROM note_links WHERE target_id = n.id) AS backlinks,
+         (SELECT json_group_array(json_object('id', t.id, 'name', t.name))
+          FROM note_tags nt JOIN tags t ON nt.tag_id = t.id
+          WHERE nt.note_id = n.id) AS tags_json
   FROM notes n
   LEFT JOIN folders f ON n.folder_id = f.id
   WHERE n.user_id = ?
@@ -15,7 +18,10 @@ const stmtFindById = db.prepare(`
   SELECT n.id, n.title, n.content, n.folder_id,
          n.created_at, n.updated_at,
          f.name AS folder,
-         (SELECT COUNT(*) FROM note_links WHERE target_id = n.id) AS backlinks
+         (SELECT COUNT(*) FROM note_links WHERE target_id = n.id) AS backlinks,
+         (SELECT json_group_array(json_object('id', t.id, 'name', t.name))
+          FROM note_tags nt JOIN tags t ON nt.tag_id = t.id
+          WHERE nt.note_id = n.id) AS tags_json
   FROM notes n
   LEFT JOIN folders f ON n.folder_id = f.id
   WHERE n.id = ? AND n.user_id = ?
@@ -29,7 +35,8 @@ const stmtDelete = db.prepare('DELETE FROM notes WHERE id = ? AND user_id = ?');
 
 function withTags(row) {
   if (!row) return null;
-  return { ...row, tags: [] };
+  const { tags_json, ...rest } = row;
+  return { ...rest, tags: JSON.parse(tags_json || '[]') };
 }
 
 export const Note = {

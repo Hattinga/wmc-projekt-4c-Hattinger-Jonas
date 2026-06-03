@@ -73,6 +73,8 @@ export const deleteFolder = (id) => request('DELETE', `/folders/${id}`);
 export const getTags = () => request('GET', '/tags');
 export const createTag = (data) => request('POST', '/tags', data);
 export const deleteTag = (id) => request('DELETE', `/tags/${id}`);
+export const addTagToNote = (noteId, tagId) => request('POST', `/tags/notes/${noteId}`, { tagId });
+export const removeTagFromNote = (noteId, tagId) => request('DELETE', `/tags/notes/${noteId}/${tagId}`);
 
 // Graph
 export const getGraph = () => request('GET', '/graph');
