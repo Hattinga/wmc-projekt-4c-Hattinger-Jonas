@@ -29,3 +29,6 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Lokaler Arbeitsplan (nicht Teil der Abgabe)
+docs/ENDSPURT.md

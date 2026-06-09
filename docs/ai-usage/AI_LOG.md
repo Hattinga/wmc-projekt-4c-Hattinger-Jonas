@@ -131,4 +131,37 @@
 - **Verifiziert:** `npm run build` → ✓ built in 14.53s (nur pre-existing a11y-Warnings)
 - **Integration:** Alles nochmal gecheckt und danach verfiziert durch tests 
 
+## KW 23 (02.06.–08.06.2026)
+
+### Session 11 – 03.06.2026
+- **Tool:** Claude Code (CLI)
+- **Zweck:** Alle KW23-Features implementieren (Links, Backlinks, Tags, Graph, WebSocket, Settings)
+- **Prompt (Zusammenfassung):** Auf Basis der bestehenden Stubs die KW23-Meilensteine umsetzen: server-seitige `[[Link]]`-Extraktion mit `note_links`-Sync, Backlinks-Endpoint + Panel-Anbindung, Tags-CRUD mit `note_tags`-Join, `GET /api/graph`, D3.js-Force-Graph statt SVG-Demo, Socket.io mit JWT-Auth und Live-Updates, Settings-Seite verdrahten
+- **Ergebnis:**
+  - `backend/src/utils/linkExtractor.js` – `syncLinks(noteId, content, userId)`: extrahiert `[[Titel]]`, matched case-insensitiv gegen Notiz-Titel des Users, ersetzt Einträge in `note_links`
+  - `backend/src/routes/notes.js` – `GET /:id/backlinks`; `syncLinks()` bei POST und PUT; WS-Emits bei PUT/DELETE
+  - `backend/src/models/Tag.js` + `routes/tags.js` – vollständiges Tags-CRUD; Note-Queries liefern Tags mit
+  - `backend/src/routes/graph.js` – Nodes (id, title) + Edges (source, target) aus `note_links`, user-scoped
+  - `backend/src/websocket/handler.js` – JWT-Verify im Handshake, Room `user:<id>`, `emitNoteUpdated`/`emitNoteDeleted`
+  - `frontend/src/lib/components/graph/GraphView.svelte` – D3 Force-Simulation mit Drag, Zoom/Pan, Node-Größe nach Degree
+  - `frontend/src/lib/services/websocket.js` – verbindet mit Token bei Login, `note:updated`/`note:deleted` aktualisieren `appState.notes`
+  - `frontend/src/routes/settings/+page.svelte` – Profil-Save, Passwort-Änderung, Theme-Toggle
+- **Integration:** Komplett übernommen (Commit 03.06.); end-to-end verifiziert per Smoke-Test am 09.06. (siehe Session 12)
+
+---
+
+## KW 24 (09.06.–11.06.2026)
+
+### Session 12 – 09.06.2026
+- **Tool:** Claude Code (CLI) — /plan Endspurt-Plan + Smoke-Test
+- **Zweck:** Projektstand analysieren, Endspurt-Plan bis Abgabe (11.06.) erstellen, KW23-Features verifizieren, Doku-Backfill
+- **Prompt (Zusammenfassung):** Docs prüfen, Plan zur Fertigstellung bis 11.06. als eigene Markdown-Datei; danach Tagesplan abarbeiten (Smoke-Test, Doku, Stub-Cleanup)
+- **Ergebnis:**
+  - `docs/ENDSPURT.md` (lokal, nicht committet) – Tag-für-Tag-Plan Di/Mi/Do mit Prioritäten und Notbremse
+  - **Smoke-Test KW23 (API-Ebene):** Register/Login ✅, Notes-CRUD ✅, `[[Link]]` → Backlink ✅, Link-Entfernung synct ✅, case-insensitives Matching ✅, toter Link erzeugt keine Phantom-Edge ✅, Graph-Endpoint ✅, WS `note:updated` bei PUT ✅, Cross-User-Isolation (404 + leerer Graph) ✅
+  - **Gefundener Bug:** `POST /api/notes` emittiert kein WS-Event und der Frontend-Handler ignoriert unbekannte Note-IDs → neue Notiz erscheint nicht live im zweiten Tab (Fix geplant)
+  - Doku-Backfill: KW23-Protokoll, FORTSCHRITT.md, dieses Log
+  - Cleanup: 6 ungenutzte Stub-Komponenten entfernt (MobileMenu, Navbar, NoteList, SearchBar, TagBadge, LanguageToggle)
+- **Integration:** Doku committet; Bugfix folgt als eigener Commit
+
 <!-- Weitere Sessions hier anhängen -->
