@@ -3,7 +3,7 @@ import { Note } from '../models/Note.js';
 import { Folder } from '../models/Folder.js';
 import { requireAuth } from '../middleware/auth.js';
 import { syncLinks } from '../utils/linkExtractor.js';
-import { emitNoteUpdated, emitNoteDeleted } from '../websocket/handler.js';
+import { emitNoteCreated, emitNoteUpdated, emitNoteDeleted } from '../websocket/handler.js';
 import db from '../config/database.js';
 
 const stmtBacklinks = db.prepare(`
@@ -50,6 +50,7 @@ export default function createNotesRouter(io) {
     const note = Note.create({ userId: req.user.id, title, content, folderId: folderId ?? null });
     syncLinks(note.id, content || '', req.user.id);
     res.status(201).json({ note });
+    emitNoteCreated(io, req.user.id, note);
   });
 
   router.put('/:id', (req, res) => {

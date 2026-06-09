@@ -28,6 +28,13 @@ export function connectWs() {
       appState.wsConnected = false;
     });
 
+    socket.on('note:created', (note) => {
+      // Nur ergänzen, wenn die Note nicht schon lokal existiert (eigener Tab hat sie bereits)
+      if (!appState.notes.some(n => n.id === note.id)) {
+        appState.notes = [note, ...appState.notes];
+      }
+    });
+
     socket.on('note:updated', (note) => {
       const idx = appState.notes.findIndex(n => n.id === note.id);
       if (idx >= 0) {

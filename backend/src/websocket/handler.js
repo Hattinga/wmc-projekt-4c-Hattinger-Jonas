@@ -16,6 +16,10 @@ export function initWebSocket(io) {
   });
 }
 
+export function emitNoteCreated(io, userId, note) {
+  io.to(`user:${userId}`).emit('note:created', note);
+}
+
 export function emitNoteUpdated(io, userId, note) {
   io.to(`user:${userId}`).emit('note:updated', note);
 }
