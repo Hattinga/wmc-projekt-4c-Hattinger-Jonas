@@ -87,6 +87,24 @@
   function handleInsertLink() {
     editorRef?.insertLinkSyntax();
   }
+
+  let deleting = $state(false);
+
+  async function deleteNote() {
+    if (!note || deleting) return;
+    if (!confirm(`Notiz "${note.title}" wirklich löschen? Das kann nicht rückgängig gemacht werden.`)) return;
+    deleting = true;
+    try {
+      clearTimeout(saveTimer);
+      saveTimer = null; // verhindert Re-Save der gelöschten Note in beforeNavigate
+      await api.deleteNote(note.id);
+      note = null;
+      goto('/dashboard');
+    } catch {
+      saveError = 'Löschen fehlgeschlagen.';
+      deleting = false;
+    }
+  }
 </script>
 
 <div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:Inter,system-ui,sans-serif;background:#fff;overflow:hidden;color:#1a1a2e;">
@@ -132,9 +150,12 @@
       <div style="font-size:12px;color:#e94560;font-weight:500;">Titel erforderlich</div>
     {/if}
 
-    <button style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;"><Icon name="star" size={16} /></button>
-    <button style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;"><Icon name="share" size={16} /></button>
-    <button style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;"><Icon name="moreH" size={16} /></button>
+    <button
+      onclick={deleteNote}
+      disabled={deleting}
+      title="Notiz löschen" aria-label="Notiz löschen"
+      style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#e94560;cursor:{deleting ? 'not-allowed' : 'pointer'};display:flex;align-items:center;justify-content:center;opacity:{deleting ? 0.5 : 1};"
+    ><Icon name="trash" size={16} /></button>
   </div>
 
   <!-- Title -->

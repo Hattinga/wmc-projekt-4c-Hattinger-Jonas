@@ -1,7 +1,7 @@
 <script>
   import Icon from '$lib/components/ui/Icon.svelte';
 
-  let { onFormat = () => {}, onInsertLink = () => {}, onTogglePreview = () => {} } = $props();
+  let { onFormat = () => {}, onInsertLink = () => {} } = $props();
 
   const tools = [
     { ic: 'bold', label: 'Fett', shortcut: '⌘B', syntax: '**' },
@@ -46,12 +46,4 @@
     <span style="font-size:10px;opacity:0.7;margin-left:2px;">⌘L</span>
   </button>
 
-  <span style="flex:1;"></span>
-
-  <button
-    onclick={onTogglePreview}
-    style="height:28px;padding:0 12px;border:1px solid rgba(26,26,46,0.10);background:#fff;color:#1a1a2e;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;"
-  >
-    <Icon name="eye" size={12} /> Nur Vorschau
-  </button>
 </div>
