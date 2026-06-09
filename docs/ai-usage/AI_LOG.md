@@ -153,15 +153,14 @@
 ## KW 24 (09.06.–11.06.2026)
 
 ### Session 12 – 09.06.2026
-- **Tool:** Claude Code (CLI) — /plan Endspurt-Plan + Smoke-Test
-- **Zweck:** Projektstand analysieren, Endspurt-Plan bis Abgabe (11.06.) erstellen, KW23-Features verifizieren, Doku-Backfill
-- **Prompt (Zusammenfassung):** Docs prüfen, Plan zur Fertigstellung bis 11.06. als eigene Markdown-Datei; danach Tagesplan abarbeiten (Smoke-Test, Doku, Stub-Cleanup)
+- **Tool:** Claude Code (CLI) — 3 parallele Explore-Subagents für Frontend-Audit
+- **Zweck:** User-gemeldete UI-Bugs prüfen (Root-Redirect, Quick-Links, fehlende Ordner-/Tag-UI) + vollständiger Funktions-Audit des Frontends
+- **Prompt (Zusammenfassung):** „Prüfe generell ob Features im Frontend alle funktionsfähig/überhaupt implementiert sind" → 3 Subagents (Routen-Audit, Komponenten-/API-Abdeckung, i18n-/Tailwind-Compliance); danach Quick-Fixes umsetzen und alle Funde dokumentieren
 - **Ergebnis:**
-  - `docs/ENDSPURT.md` (lokal, nicht committet) – Tag-für-Tag-Plan Di/Mi/Do mit Prioritäten und Notbremse
-  - **Smoke-Test KW23 (API-Ebene):** Register/Login ✅, Notes-CRUD ✅, `[[Link]]` → Backlink ✅, Link-Entfernung synct ✅, case-insensitives Matching ✅, toter Link erzeugt keine Phantom-Edge ✅, Graph-Endpoint ✅, WS `note:updated` bei PUT ✅, Cross-User-Isolation (404 + leerer Graph) ✅
-  - **Gefundener Bug:** `POST /api/notes` emittiert kein WS-Event und der Frontend-Handler ignoriert unbekannte Note-IDs → neue Notiz erscheint nicht live im zweiten Tab (Fix geplant)
-  - Doku-Backfill: KW23-Protokoll, FORTSCHRITT.md, dieses Log
-  - Cleanup: 6 ungenutzte Stub-Komponenten entfernt (MobileMenu, Navbar, NoteList, SearchBar, TagBadge, LanguageToggle)
-- **Integration:** Doku committet; Bugfix folgt als eigener Commit
+  - `docs/FRONTEND_AUDIT.md` – alle Funde klassifiziert (behoben / vor Abgabe / Backlog) inkl. API-Abdeckungsmatrix (10 von 21 Endpoints waren vom Frontend ungenutzt)
+  - **Fixes:** Root-Redirect token-abhängig; Sidebar-Ordner-UI (erstellen/löschen/filtern via `?folder=`); Notiz-Löschen im Editor mit Confirm; tote UI entfernt (Quick-Links Eingang/Favoriten, Demo-Ordner/-Tags, Star/Share/Bell, Nur-Vorschau-Toggle)
+  - **Verifiziert:** Build ✓; Ordner-Lifecycle per API end-to-end (Note überlebt Ordner-Löschung mit `folder_id=null`)
+  - UI/UX-Pro-Max-Skill global installiert (`~/.claude/skills/`), UX-Guidelines (Confirm vor Destruktiv-Aktionen, Empty-States statt Demo-Daten) angewendet
+- **Integration:** 2 Commits (docs-Audit + feat-Fixes); größere Funde (Responsive, Tag-UI, i18n-Extraktion, Graph-Filter) für 10.06. eingeplant
 
 <!-- Weitere Sessions hier anhängen -->
