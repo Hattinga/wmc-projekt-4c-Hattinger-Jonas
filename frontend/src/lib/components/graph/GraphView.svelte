@@ -84,10 +84,13 @@
       .force('center', d3.forceCenter(svgWidth / 2, svgHeight / 2))
       .force('collide', d3.forceCollide(d => nodeRadius(d) + 5))
       .on('tick', () => {
+        // Beide Arrays neu zuweisen: D3 mutiert die rohen Objekte am Svelte-Proxy
+        // vorbei – ohne Reassignment bleiben die Linien auf den Startpositionen (0,0)
         simulationNodes = [...simulation.nodes()];
+        simulationEdges = [...simulation.force('link').links()];
       });
 
-    simulationEdges = simulation.force('link').links();
+    simulationEdges = [...simulation.force('link').links()];
 
     return () => simulation.stop();
   });
@@ -117,6 +120,7 @@
           node.fx = event.x;
           node.fy = event.y;
           simulationNodes = [...simulation.nodes()];
+          simulationEdges = [...simulation.force('link').links()];
         })
         .on('end', event => {
           if (!simulation) return;
