@@ -16,14 +16,16 @@ geprüft und klassifiziert. Status-Spalte zeigt den Stand **nach** den Fixes vom
 | Demo-Fallback-Ordner/-Tags ("Arbeit", "Entwicklung", #sprint …) erscheinen bei leerer DB und wirken echt | `Sidebar.svelte:162-179` | Fallback entfernt, leerer Zustand zeigt Hinweis |
 | Tote Buttons: Star/Share (Dashboard-Preview + Editor), Notification-Bell, "Nur Vorschau"-Toggle (Handler nie übergeben) | `dashboard:82,153,154`, `note/[id]:135-137`, `Toolbar.svelte:51` | entfernt |
 
-## Offen — geplant vor Abgabe (10.06.) 🟡
+## Geplant vor Abgabe — erledigt am 10.06. ✅
 
-| Fund | Ort | Plan |
-|------|-----|------|
-| Kein responsives Layout: fixe Sidebar (240px), 0 Breakpoints, 273 Inline-Styles statt Tailwind (CLAUDE.md-Vorgabe: Mobile-First) | alle Komponenten, v.a. `+layout.svelte` | Mi 10.06. Prio 1: einklappbare Sidebar <640px, Breakpoint-Pass |
-| Tag-Zuweisung fehlt im UI (Backend-Endpoints `POST/DELETE /tags/notes/:noteId` + api.js-Funktionen existieren ungenutzt) | `note/[id]/+page.svelte` | Mi 10.06. Prio 2: Tag-Chips + Eingabe im Editor |
-| i18n nur ~2% genutzt: ~250 hartcodierte deutsche Strings, Sprachumschalter wechselt `locale` aber nichts Sichtbares (CLAUDE.md-Vorgabe: `t('key')`) | 11 Svelte-Dateien | Mi 10.06. nach Responsive, notfalls auf Hauptscreens begrenzt |
-| Graph: Ordner-Filter-Checkboxen togglen State, der nie angewendet wird (`filteredNodes` nutzt nur `searchQuery`) | `graph/+page.svelte:42-53` | Kleinfix Mi/Do oder Checkboxen entfernen |
+| Fund | Ort | Umsetzung (10.06.) |
+|------|-----|--------------------|
+| Kein responsives Layout: fixe Sidebar (240px), 0 Breakpoints, 273 Inline-Styles statt Tailwind (CLAUDE.md-Vorgabe: Mobile-First) | alle Komponenten, v.a. `+layout.svelte` | ✅ Sidebar <640px als Slide-in (Hamburger + Overlay, `appState.sidebarOpen`), Editor-Split-View gestackt, Dashboard mobil als Liste, Settings-Nav als Chip-Leiste. Gezielte Breakpoint-Fixes statt Komplett-Migration der Inline-Styles. |
+| Tag-Zuweisung fehlt im UI (Backend-Endpoints `POST/DELETE /tags/notes/:noteId` + api.js-Funktionen existieren ungenutzt) | `note/[id]/+page.svelte` | ✅ Tag-Chips + Eingabefeld im Editor; 409-Duplikate werden wiederverwendet; api.js-Fix für leere Response-Bodies |
+| i18n nur ~2% genutzt: ~250 hartcodierte deutsche Strings, Sprachumschalter wechselt `locale` aber nichts Sichtbares (CLAUDE.md-Vorgabe: `t('key')`) | 11 Svelte-Dateien | ✅ ~130 Strings (alle Hauptscreens: Sidebar, Dashboard, Editor, Auth, Settings-Chrome, Graph) über `t()`; `setLocale()` mit localStorage; Settings-Stub-Texte bewusst ausgenommen |
+| Graph: Ordner-Filter-Checkboxen togglen State, der nie angewendet wird (`filteredNodes` nutzt nur `searchQuery`) | `graph/+page.svelte:42-53` | ✅ Entfernt (Anwenden hätte Backend-Änderung gebraucht: kein `folder_id` im Graph-Endpoint); irreführende Ordner-Farb-Legende ebenfalls raus |
+
+**Bonus-Fund 10.06.:** Graph-Edges klebten bei (0,0) — `simulationEdges` wurde nicht pro Tick neu zugewiesen, D3 mutiert am Svelte-Proxy vorbei. Gefixt; sichtbar erst mit dicht vernetztem Seed-Graphen (24 Notizen, 53 Links).
 
 ## Offen — bewusst nicht vor Abgabe (Backlog) ⬜
 
