@@ -58,15 +58,36 @@
     { ic: 'settings', key: 'nav.settings', href: '/settings' },
   ];
 
-  function toggleFolder(id, event) {
-    event.stopPropagation();
+  function toggleOpen(id) {
     if (openFolders.has(id)) openFolders.delete(id);
     else openFolders.add(id);
     openFolders = new Set(openFolders);
   }
 
+  function toggleFolder(id, event) {
+    event.stopPropagation();
+    toggleOpen(id);
+  }
+
   function filterByFolder(id) {
     goto(`/dashboard?folder=${id}`);
+  }
+
+  // 1× Klick: auf-/zuklappen (Ordner ohne Kinder: direkt filtern) — 2× Klick: Detail-Ansicht.
+  // click feuert auch beim Doppelklick → kurzer Timer, den dblclick abbricht.
+  let clickTimer = null;
+
+  function handleFolderClick(folder) {
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(() => {
+      if (folder.children?.length) toggleOpen(folder.id);
+      else filterByFolder(folder.id);
+    }, 220);
+  }
+
+  function handleFolderDblClick(folder) {
+    clearTimeout(clickTimer);
+    filterByFolder(folder.id);
   }
 
   async function createFolder() {
@@ -177,7 +198,8 @@
       <div>
         <div
           role="button" tabindex="0"
-          onclick={() => filterByFolder(folder.id)}
+          onclick={() => handleFolderClick(folder)}
+          ondblclick={() => handleFolderDblClick(folder)}
           onkeydown={(e) => e.key === 'Enter' && filterByFolder(folder.id)}
           style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;color:{activeFolderId === folder.id ? '#fff' : 'rgba(255,255,255,0.78)'};background:{activeFolderId === folder.id ? 'rgba(233,69,96,0.14)' : 'transparent'};font-size:12.5px;font-weight:500;width:100%;box-sizing:border-box;"
         >
