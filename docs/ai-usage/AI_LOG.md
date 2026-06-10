@@ -175,4 +175,16 @@
 - **Verifiziert:** `npm run build` ✓ (nur pre-existing a11y-Warnings); Tag-Flow end-to-end gegen laufendes Backend (attach 201 → Tags in Note-Response → detach 204)
 - **Integration:** 4 Commits (refactor graph, feat responsive, feat i18n, feat tags)
 
+### Session 14 – 10.06.2026 (abends)
+- **Tool:** Claude Code (CLI) + ui-ux-pro-max-Skill
+- **Zweck:** Editor-Live-Sync (Zweittab), Graph-Edge-Bugfix, Dark Mode, Unterordner-UI, Design-Verifikation; Seed-Skript für dichten Test-Graphen
+- **Prompt (Zusammenfassung):** „Komplexen Graph aus Notizen seeden" → Seed über Backend-Models (24 Notizen, 53 Links) deckte echten Bug auf: Graph-Edges klebten bei (0,0), weil `simulationEdges` nicht pro Tick neu zugewiesen wurde (D3 mutiert am Svelte-Proxy vorbei). Danach: „Design via ui-ux-pro-max verifizieren, Dark Mode, Ordner aufklappen + Unterordner"
+- **Ergebnis:**
+  - **Editor-Live-Sync:** Offener Editor übernimmt `note:updated`/`note:deleted` aus anderem Tab (lokale ungespeicherte Eingaben haben Vorrang) — gleichzeitiges Arbeiten an einer Notiz über zwei Tabs
+  - **Dark Mode:** Theme-Tokens in `app.css` (`:root`/`.dark`), `theme.js` mit `applyTheme/setTheme` inkl. `system` via `prefers-color-scheme`; Layout initialisiert global (vorher wirkte das Theme nur nach Settings-Besuch); Inline-Farben per Sweep auf `var(...)`; GraphView-SVG-Farben in style-Attribute (SVG-Attribute können kein `var()`)
+  - **Unterordner:** +-Button pro Ordner-Zeile mit Inline-Input, nutzt vorhandenes `parentId` im Backend, klappt Parent auto auf
+  - **Design-Verifikation (Skill):** Font-/Palette-Vorschläge des Skills bewusst abgelehnt (etablierte Identität Inter + #e94560 bleibt); übernommen: Token-Theming, Dark-Mode-Regeln (kein pures Schwarz, Kontraste separat geprüft ≥4.5:1), Fixes: sichtbarer `:focus-visible`-Ring (Inputs hatten `outline:none`), `prefers-reduced-motion`-Support
+- **Verifiziert:** Builds ✓; Tag-/Graph-Daten via Seed; Kontraste der Dark-Tokens rechnerisch geprüft
+- **Integration:** 6 Commits (fix graph, feat ws, feat folders, feat theme, polish a11y, docs)
+
 <!-- Weitere Sessions hier anhängen -->
