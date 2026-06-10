@@ -5,6 +5,7 @@
   import Toolbar from '$lib/components/editor/Toolbar.svelte';
   import MarkdownEditor from '$lib/components/editor/MarkdownEditor.svelte';
   import BacklinksPanel from '$lib/components/editor/BacklinksPanel.svelte';
+  import { t } from '$lib/i18n/index.js';
   import * as api from '$lib/services/api.js';
 
   let noteId = $derived($page.params.id);
@@ -37,7 +38,7 @@
       if (e.message?.includes('nicht gefunden') || e.message?.includes('404')) {
         goto('/dashboard');
       } else {
-        loadError = 'Notiz konnte nicht geladen werden.';
+        loadError = t('editor.loadFailed');
       }
     });
     api.getNotes().then(r => { allNotes = r.notes ?? []; });
@@ -63,7 +64,7 @@
         savedAt = new Date();
         api.getNoteBacklinks(currentId).then(res => { backlinks = res.backlinks ?? []; }).catch(() => {});
       } catch {
-        saveError = 'Speichern fehlgeschlagen.';
+        saveError = t('editor.saveFailed');
       } finally {
         saving = false;
       }
@@ -92,7 +93,7 @@
 
   async function deleteNote() {
     if (!note || deleting) return;
-    if (!confirm(`Notiz "${note.title}" wirklich löschen? Das kann nicht rückgängig gemacht werden.`)) return;
+    if (!confirm(t('editor.deleteConfirm', { title: note.title }))) return;
     deleting = true;
     try {
       clearTimeout(saveTimer);
@@ -101,7 +102,7 @@
       note = null;
       goto('/dashboard');
     } catch {
-      saveError = 'Löschen fehlgeschlagen.';
+      saveError = t('editor.deleteFailed');
       deleting = false;
     }
   }
@@ -138,22 +139,22 @@
       <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:12px;background:{saving ? 'rgba(136,136,153,0.08)' : 'rgba(42,157,110,0.08)'};color:{saving ? '#888899' : '#2a9d6e'};">
         {#if saving}
           <span style="width:12px;height:12px;border:2px solid #ccc;border-top-color:#888899;border-radius:50%;display:inline-block;animation:spin 0.7s linear infinite;"></span>
-          Speichert…
+          {t('editor.saving')}
         {:else}
           <Icon name="check" size={12} color="#2a9d6e" strokeWidth={2.5} />
-          Gespeichert
+          {t('editor.saved')}
         {/if}
       </div>
     {/if}
 
     {#if !title?.trim() && title !== ''}
-      <div style="font-size:12px;color:#e94560;font-weight:500;">Titel erforderlich</div>
+      <div style="font-size:12px;color:#e94560;font-weight:500;">{t('editor.titleRequired')}</div>
     {/if}
 
     <button
       onclick={deleteNote}
       disabled={deleting}
-      title="Notiz löschen" aria-label="Notiz löschen"
+      title={t('editor.deleteNote')} aria-label={t('editor.deleteNote')}
       style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#e94560;cursor:{deleting ? 'not-allowed' : 'pointer'};display:flex;align-items:center;justify-content:center;opacity:{deleting ? 0.5 : 1};"
     ><Icon name="trash" size={16} /></button>
   </div>
@@ -162,7 +163,7 @@
   <div class="px-4 pt-5 sm:px-7" style="flex-shrink:0;">
     <input
       bind:value={title}
-      placeholder="Titel…"
+      placeholder={t('editor.titlePlaceholder')}
       style="width:100%;border:none;outline:none;font-size:28px;font-weight:700;letter-spacing:-0.6px;color:#1a1a2e;font-family:inherit;background:transparent;padding:0;"
     />
   </div>

@@ -1,6 +1,7 @@
 <script>
   import './registerForm.css';
   import Icon from '$lib/components/ui/Icon.svelte';
+  import { t } from '$lib/i18n/index.js';
 
   let { onsubmit = () => {}, loading = false, error = '' } = $props();
 
@@ -15,11 +16,11 @@
     e.preventDefault();
     if (loading) return;
     if (password.length < 8) {
-      validationError = 'Passwort muss mindestens 8 Zeichen lang sein.';
+      validationError = t('auth.passwordMinLength');
       return;
     }
     if (password !== passwordConfirm) {
-      validationError = 'Passwörter stimmen nicht überein.';
+      validationError = t('auth.passwordMismatch');
       return;
     }
     validationError = '';
@@ -31,7 +32,7 @@
 
 <form class="register-form" onsubmit={handleSubmit}>
   <div class="register-form-field">
-    <label for="register-username" class="register-form-label">Benutzername</label>
+    <label for="register-username" class="register-form-label">{t('auth.username')}</label>
     <div class="register-form-input-wrap">
       <span class="register-form-icon"><Icon name="user" size={16} color="#888899" /></span>
       <input
@@ -47,7 +48,7 @@
   </div>
 
   <div class="register-form-field">
-    <label for="register-email" class="register-form-label">E-Mail</label>
+    <label for="register-email" class="register-form-label">{t('auth.email')}</label>
     <div class="register-form-input-wrap">
       <span class="register-form-icon"><Icon name="mail" size={16} color="#888899" /></span>
       <input
@@ -63,7 +64,7 @@
   </div>
 
   <div class="register-form-field">
-    <label for="register-password" class="register-form-label">Passwort</label>
+    <label for="register-password" class="register-form-label">{t('auth.password')}</label>
     <div class="register-form-input-wrap">
       <span class="register-form-icon"><Icon name="lock" size={16} color="#888899" /></span>
       <input
@@ -79,7 +80,7 @@
         type="button"
         class="register-form-pw-toggle"
         onclick={() => showPw = !showPw}
-        aria-label={showPw ? 'Passwort verbergen' : 'Passwort anzeigen'}
+        aria-label={showPw ? t('auth.hidePassword') : t('auth.showPassword')}
         aria-pressed={showPw}
       >
         <Icon name={showPw ? 'eyeOff' : 'eye'} size={16} color="#888899" />
@@ -88,7 +89,7 @@
   </div>
 
   <div class="register-form-field">
-    <label for="register-confirm" class="register-form-label">Passwort bestätigen</label>
+    <label for="register-confirm" class="register-form-label">{t('auth.confirmPassword')}</label>
     <div class="register-form-input-wrap">
       <span class="register-form-icon"><Icon name="lock" size={16} color="#888899" /></span>
       <input
@@ -108,7 +109,7 @@
   {/if}
 
   <button type="submit" class="register-form-submit" disabled={loading}>
-    {loading ? 'Laden…' : 'Konto erstellen'}
+    {loading ? t('auth.loading') : t('auth.createAccount')}
     <Icon name="arrowRight" size={16} color="#fff" strokeWidth={2.2} />
   </button>
 </form>

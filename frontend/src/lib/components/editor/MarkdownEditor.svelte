@@ -1,6 +1,7 @@
 <script>
   import Icon from '$lib/components/ui/Icon.svelte';
   import { appState } from '$lib/stores/appState.svelte.js';
+  import { t } from '$lib/i18n/index.js';
   import { renderMarkdown } from '$lib/utils/markdown.js';
   import { extractLinks } from '$lib/utils/linkParser.js';
 
@@ -102,9 +103,9 @@
 <div class="flex-1 flex flex-col min-w-0 min-h-0 border-b sm:border-b-0 sm:border-r border-[rgba(26,26,46,0.08)]">
   <!-- Pane header -->
   <div style="height:36px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid rgba(26,26,46,0.06);background:#fafaf8;flex-shrink:0;">
-    <span style="font-size:10.5px;font-weight:600;color:#888899;letter-spacing:0.8px;text-transform:uppercase;">Markdown</span>
+    <span style="font-size:10.5px;font-weight:600;color:#888899;letter-spacing:0.8px;text-transform:uppercase;">{t('editor.markdown')}</span>
     <span style="flex:1;"></span>
-    <span style="font-size:11px;color:#888899;">{wordCount} Wörter</span>
+    <span style="font-size:11px;color:#888899;">{wordCount} {t('editor.words')}</span>
   </div>
 
   <!-- Textarea -->
@@ -122,7 +123,7 @@
     <!-- [[Note]] Autocomplete -->
     {#if autocompleteOpen && suggestions.length > 0}
       <div class="max-w-[calc(100vw-2rem)]" style="position:absolute;top:218px;left:188px;background:#fff;border:1px solid rgba(26,26,46,0.10);border-radius:8px;padding:4px;min-width:240px;box-shadow:0 10px 30px rgba(26,26,46,0.12);z-index:3;">
-        <div style="font-size:10.5px;font-weight:600;color:#888899;padding:6px 10px;letter-spacing:0.5px;text-transform:uppercase;">Notiz einfügen</div>
+        <div style="font-size:10.5px;font-weight:600;color:#888899;padding:6px 10px;letter-spacing:0.5px;text-transform:uppercase;">{t('editor.insertNote')}</div>
         {#each suggestions as note, i}
           <button
             onmousedown={(e) => { e.preventDefault(); insertLink(note.title); }}
@@ -142,7 +143,7 @@
 <!-- Rechte Seite: Rendered Preview -->
 <div class="flex-1 flex flex-col min-w-0 min-h-0">
   <div style="height:36px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid rgba(26,26,46,0.06);background:#fafaf8;flex-shrink:0;">
-    <span style="font-size:10.5px;font-weight:600;color:#888899;letter-spacing:0.8px;text-transform:uppercase;">Vorschau</span>
+    <span style="font-size:10.5px;font-weight:600;color:#888899;letter-spacing:0.8px;text-transform:uppercase;">{t('editor.preview')}</span>
     <span style="flex:1;"></span>
     <button style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;">
       <Icon name="maximize" size={13} />

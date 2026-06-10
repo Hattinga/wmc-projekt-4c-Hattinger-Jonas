@@ -1,5 +1,6 @@
 <script>
   import { goto } from '$app/navigation';
+  import { t } from '$lib/i18n/index.js';
   import * as d3 from 'd3';
 
   let { nodes = [], edges = [] } = $props();
@@ -200,6 +201,6 @@
 {#if hoveredNode && hoveredNode.x != null}
   <div style="position:absolute;left:{hoveredNode.x + 28}px;top:{hoveredNode.y - 30}px;background:#1a1a2e;color:#fff;padding:10px 12px;border-radius:8px;font-size:12px;box-shadow:0 8px 24px rgba(26,26,46,0.30);min-width:160px;max-width:220px;z-index:4;pointer-events:none;font-family:Inter,system-ui,sans-serif;">
     <div style="font-weight:600;font-size:13px;">{hoveredNode.title}</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px;">{hoveredDegree} Verbindungen</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px;">{hoveredDegree} {t('graph.connections')}</div>
   </div>
 {/if}

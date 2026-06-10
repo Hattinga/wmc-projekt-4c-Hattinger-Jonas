@@ -2,7 +2,7 @@
   import { goto } from '$app/navigation';
   import Icon from '$lib/components/ui/Icon.svelte';
   import { appState, logout } from '$lib/stores/appState.svelte.js';
-  import { setLocale } from '$lib/i18n/index.js';
+  import { t, setLocale } from '$lib/i18n/index.js';
   import * as api from '$lib/services/api.js';
 
   let activeSection = $state('profil');
@@ -66,15 +66,15 @@
     passwordSaved = false;
 
     if (!currentPassword) {
-      passwordError = 'Bitte das aktuelle Passwort eingeben.';
+      passwordError = t('settings.currentPasswordRequired');
       return;
     }
     if (newPassword.length < 8) {
-      passwordError = 'Neues Passwort muss mindestens 8 Zeichen haben.';
+      passwordError = t('settings.passwordMinLength');
       return;
     }
     if (newPassword !== newPasswordConfirm) {
-      passwordError = 'Neue Passwörter stimmen nicht überein.';
+      passwordError = t('settings.passwordMismatch');
       return;
     }
 
@@ -110,13 +110,14 @@
     goto('/auth');
   }
 
+  // Labels über t(`settings.sections.${id}`) im Markup – hier nur IDs/Icons
   const sections = [
-    { id: 'profil', ic: 'user', label: 'Profil' },
-    { id: 'sicherheit', ic: 'lock', label: 'Sicherheit' },
-    { id: 'sprache', ic: 'globe', label: 'Sprache' },
-    { id: 'darstellung', ic: 'sun', label: 'Darstellung' },
-    { id: 'export', ic: 'download', label: 'Export & Backup' },
-    { id: 'benachrichtigungen', ic: 'bell', label: 'Benachrichtigungen' },
+    { id: 'profil', ic: 'user' },
+    { id: 'sicherheit', ic: 'lock' },
+    { id: 'sprache', ic: 'globe' },
+    { id: 'darstellung', ic: 'sun' },
+    { id: 'export', ic: 'download' },
+    { id: 'benachrichtigungen', ic: 'bell' },
   ];
 </script>
 
@@ -127,7 +128,7 @@
     <button onclick={() => goto('/dashboard')} style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;">
       <Icon name="chevLeft" size={18} />
     </button>
-    <h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-0.3px;">Einstellungen</h2>
+    <h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-0.3px;">{t('settings.title')}</h2>
     <span style="flex:1;"></span>
     <div style="width:34px;height:34px;border-radius:17px;background:linear-gradient(135deg,#1a1a2e,#2d2d4a);color:#fff;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;">
       {appState.currentUser?.username?.slice(0,2).toUpperCase() || 'MN'}
@@ -145,7 +146,7 @@
           style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:7px;cursor:pointer;border:1px solid {activeSection === s.id ? 'rgba(26,26,46,0.08)' : 'transparent'};background:{activeSection === s.id ? '#fff' : 'transparent'};color:{activeSection === s.id ? '#1a1a2e' : '#6b6b80'};font-size:13px;font-weight:{activeSection === s.id ? 600 : 500};box-shadow:{activeSection === s.id ? '0 1px 2px rgba(26,26,46,0.04)' : 'none'};font-family:inherit;text-align:left;"
         >
           <Icon name={s.ic} size={15} color={activeSection === s.id ? '#e94560' : '#888899'} />
-          {s.label}
+          {t(`settings.sections.${s.id}`)}
         </button>
       {/each}
     </div>
@@ -156,8 +157,8 @@
 
         {#if activeSection === 'profil'}
           <div style="margin-bottom:32px;">
-            <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">Profil</h3>
-            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">Wie andere dich in Zettlwirtschaft sehen.</p>
+            <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">{t('settings.profileTitle')}</h3>
+            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">{t('settings.profileSubtitle')}</p>
 
             <!-- Avatar -->
             <div style="display:flex;gap:18px;align-items:center;margin-bottom:18px;">
@@ -172,7 +173,7 @@
 
             <div style="display:flex;flex-direction:column;gap:14px;">
               <div>
-                <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">Benutzername</label>
+                <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">{t('settings.username')}</label>
                 <input
                   type="text"
                   bind:value={username}
@@ -180,7 +181,7 @@
                 />
               </div>
               <div>
-                <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">E-Mail</label>
+                <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">{t('settings.email')}</label>
                 <input
                   type="email"
                   bind:value={email}
@@ -191,24 +192,24 @@
                 <p style="margin:0;font-size:12.5px;color:#e94560;">{profileError}</p>
               {/if}
               {#if profileSaved}
-                <p style="margin:0;font-size:12.5px;color:#22c55e;">Profil gespeichert.</p>
+                <p style="margin:0;font-size:12.5px;color:#22c55e;">{t('settings.profileSaved')}</p>
               {/if}
               <button
                 onclick={saveProfile}
                 disabled={profileSaving}
                 style="height:42px;border:none;border-radius:9px;background:{profileSaving ? '#888899' : '#e94560'};color:#fff;font-weight:600;font-size:13.5px;cursor:{profileSaving ? 'not-allowed' : 'pointer'};font-family:inherit;opacity:{profileSaving ? 0.7 : 1};"
               >
-                {profileSaving ? 'Wird gespeichert…' : 'Änderungen speichern'}
+                {profileSaving ? t('settings.saving') : t('settings.save')}
               </button>
             </div>
           </div>
 
         {:else if activeSection === 'sicherheit'}
           <div style="margin-bottom:32px;">
-            <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">Sicherheit</h3>
-            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">Passwort und Zwei-Faktor-Authentifizierung.</p>
+            <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">{t('settings.securityTitle')}</h3>
+            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">{t('settings.securitySubtitle')}</p>
             <div style="display:flex;flex-direction:column;gap:14px;">
-              {#each [['Aktuelles Passwort', currentPassword, (v) => currentPassword = v], ['Neues Passwort', newPassword, (v) => newPassword = v], ['Neues Passwort wiederholen', newPasswordConfirm, (v) => newPasswordConfirm = v]] as [label, val, setter]}
+              {#each [[t('settings.currentPassword'), currentPassword, (v) => currentPassword = v], [t('settings.newPassword'), newPassword, (v) => newPassword = v], [t('settings.confirmNewPassword'), newPasswordConfirm, (v) => newPasswordConfirm = v]] as [label, val, setter]}
                 <div>
                   <label style="font-size:12px;font-weight:600;color:#6b6b80;display:block;margin-bottom:6px;">{label}</label>
                   <input type="password" value={val} oninput={(e) => setter(e.currentTarget.value)} placeholder="••••••••••" style="width:100%;height:42px;padding:0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;font-size:13.5px;color:#1a1a2e;font-family:inherit;outline:none;box-sizing:border-box;" />
@@ -218,14 +219,14 @@
                 <p style="margin:0;font-size:12.5px;color:#e94560;">{passwordError}</p>
               {/if}
               {#if passwordSaved}
-                <p style="margin:0;font-size:12.5px;color:#22c55e;">Passwort geändert.</p>
+                <p style="margin:0;font-size:12.5px;color:#22c55e;">{t('settings.passwordChanged')}</p>
               {/if}
               <button
                 onclick={changePassword}
                 disabled={passwordSaving}
                 style="height:42px;border:none;border-radius:9px;background:{passwordSaving ? '#888899' : '#e94560'};color:#fff;font-weight:600;font-size:13.5px;cursor:{passwordSaving ? 'not-allowed' : 'pointer'};font-family:inherit;opacity:{passwordSaving ? 0.7 : 1};"
               >
-                {passwordSaving ? 'Wird gespeichert…' : 'Passwort ändern'}
+                {passwordSaving ? t('settings.saving') : t('settings.changePassword')}
               </button>
               <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid rgba(26,26,46,0.06);">
                 <div style="flex:1;">
@@ -241,8 +242,8 @@
 
         {:else if activeSection === 'sprache'}
           <div style="margin-bottom:32px;">
-            <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">Sprache</h3>
-            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">Wähle deine bevorzugte Sprache.</p>
+            <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">{t('settings.languageTitle')}</h3>
+            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">{t('settings.languageSubtitle')}</p>
             <div style="position:relative;max-width:320px;">
               <select value={appState.locale} onchange={(e) => setLocale(e.currentTarget.value)} style="width:100%;height:44px;padding:0 36px 0 14px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;font-size:13.5px;color:#1a1a2e;font-family:inherit;cursor:pointer;appearance:none;">
                 <option value="de">🇩🇪 Deutsch</option>
@@ -254,10 +255,10 @@
 
         {:else if activeSection === 'darstellung'}
           <div style="margin-bottom:32px;">
-            <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">Darstellung</h3>
-            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">Light oder Dark Mode.</p>
+            <h3 style="margin:0 0 4px;font-size:17px;font-weight:700;letter-spacing:-0.3px;">{t('settings.appearanceTitle')}</h3>
+            <p style="margin:0 0 18px;font-size:12.5px;color:#888899;">{t('settings.appearanceSubtitle')}</p>
             <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
-              {#each [['light', 'Hell', '#fff', '#1a1a2e'], ['dark', 'Dunkel', '#1a1a2e', '#fff'], ['system', 'System', 'linear-gradient(135deg,#fff 50%,#1a1a2e 50%)', '#1a1a2e']] as [key, label, bg, fg]}
+              {#each [['light', t('settings.themeLight'), '#fff', '#1a1a2e'], ['dark', t('settings.themeDark'), '#1a1a2e', '#fff'], ['system', t('settings.themeSystem'), 'linear-gradient(135deg,#fff 50%,#1a1a2e 50%)', '#1a1a2e']] as [key, label, bg, fg]}
                 <button
                   onclick={() => theme = key}
                   style="width:130px;padding:10px;border-radius:10px;background:#fff;border:2px solid {theme === key ? '#e94560' : 'rgba(26,26,46,0.10)'};cursor:pointer;font-family:inherit;text-align:center;"
@@ -316,16 +317,16 @@
         <div style="margin-top:24px;padding:14px 18px;border:1px solid rgba(233,69,96,0.20);border-radius:10px;background:rgba(233,69,96,0.04);display:flex;align-items:center;gap:14px;">
           <Icon name="trash" size={16} color="#e94560" />
           <div style="flex:1;">
-            <div style="font-size:13.5px;font-weight:600;color:#e94560;">Konto löschen</div>
-            <div style="font-size:12px;color:#888899;margin-top:2px;">Endgültig — alle Notizen und Backlinks werden gelöscht.</div>
+            <div style="font-size:13.5px;font-weight:600;color:#e94560;">{t('settings.deleteAccount')}</div>
+            <div style="font-size:12px;color:#888899;margin-top:2px;">{t('settings.deleteAccountDesc')}</div>
           </div>
-          <button onclick={handleDeleteAccount} style="height:34px;padding:0 14px;border:1px solid rgba(233,69,96,0.40);background:#fff;color:#e94560;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">Löschen</button>
+          <button onclick={handleDeleteAccount} style="height:34px;padding:0 14px;border:1px solid rgba(233,69,96,0.40);background:#fff;color:#e94560;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;">{t('settings.delete')}</button>
         </div>
 
         <div style="height:16px;"></div>
 
         <button onclick={handleLogout} style="width:100%;height:42px;border:1px solid rgba(26,26,46,0.12);border-radius:9px;background:#fff;color:#1a1a2e;font-weight:600;font-size:13.5px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;">
-          <Icon name="arrowRight" size={15} /> Abmelden
+          <Icon name="arrowRight" size={15} /> {t('settings.logout')}
         </button>
 
         <div style="height:32px;"></div>

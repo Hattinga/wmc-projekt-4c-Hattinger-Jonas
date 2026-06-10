@@ -1,6 +1,7 @@
 <script>
   import Icon from '$lib/components/ui/Icon.svelte';
   import { goto } from '$app/navigation';
+  import { t } from '$lib/i18n/index.js';
   import { escapeHtml } from '$lib/utils/markdown.js';
 
   let { backlinks = [], noteId = '' } = $props();
@@ -31,12 +32,12 @@
       <Icon name={open ? 'chevDown' : 'chevRight'} size={14} color="#888899" />
       <Icon name="link2" size={14} color="#e94560" />
       <span style="font-size:13px;font-weight:600;color:#1a1a2e;">{backlinks.length} Backlinks</span>
-      <span style="font-size:12px;color:#888899;">· Notizen, die hierher verlinken</span>
+      <span style="font-size:12px;color:#888899;">· {t('editor.backlinksHint')}</span>
     </button>
     <button
       onclick={() => goto('/graph')}
       style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;"
-      aria-label="Graph-Ansicht öffnen"
+      aria-label={t('editor.openGraph')}
     >
       <Icon name="graph" size={13} />
     </button>
@@ -60,7 +61,7 @@
         </button>
       {/each}
       {#if backlinks.length === 0}
-        <div style="font-size:12.5px;color:#888899;padding:4px 0;">Keine Notizen verlinken auf diese Notiz.</div>
+        <div style="font-size:12.5px;color:#888899;padding:4px 0;">{t('editor.noBacklinks')}</div>
       {/if}
     </div>
   {/if}

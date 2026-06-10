@@ -2,6 +2,7 @@
   import { goto } from '$app/navigation';
   import Icon from '$lib/components/ui/Icon.svelte';
   import { appState } from '$lib/stores/appState.svelte.js';
+  import { t, setLocale } from '$lib/i18n/index.js';
   import * as api from '$lib/services/api.js';
   import LoginForm from '$lib/components/auth/LoginForm.svelte';
   import RegisterForm from '$lib/components/auth/RegisterForm.svelte';
@@ -140,12 +141,10 @@
   <!-- Auth card -->
   <div class="zw-auth-card auth-page-card">
     <h1 class="auth-page-title">
-      {mode === 'login' ? 'Willkommen zurück' : 'Konto erstellen'}
+      {mode === 'login' ? t('auth.welcomeBack') : t('auth.createAccount')}
     </h1>
     <p class="auth-page-subtitle">
-      {mode === 'login'
-        ? 'Melde dich an, um deine Notizen zu öffnen.'
-        : 'Starte deine vernetzte Wissensbasis.'}
+      {mode === 'login' ? t('auth.loginSubtitle') : t('auth.registerSubtitle')}
     </p>
 
     <!-- Tab switcher -->
@@ -160,7 +159,7 @@
           onclick={() => { mode = m; error = ''; }}
           class="auth-page-tab-btn {mode === m ? 'auth-page-tab-btn--active' : 'auth-page-tab-btn--inactive'}"
         >
-          {m === 'login' ? 'Anmelden' : 'Registrieren'}
+          {m === 'login' ? t('auth.login') : t('auth.register')}
         </button>
       {/each}
     </div>
@@ -189,7 +188,7 @@
         {#each [['de', '🇩🇪', 'Deutsch'], ['en', '🇬🇧', 'English']] as [code, flag, label]}
           <button
             type="button"
-            onclick={() => { appState.locale = code; langOpen = false; }}
+            onclick={() => { setLocale(code); langOpen = false; }}
             class="auth-page-lang-option {appState.locale === code ? 'auth-page-lang-option--active' : 'auth-page-lang-option--inactive'}"
           >
             <span>{flag}</span> {label}

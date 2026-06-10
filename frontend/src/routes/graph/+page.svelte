@@ -4,6 +4,7 @@
   import GraphView from '$lib/components/graph/GraphView.svelte';
   import * as api from '$lib/services/api.js';
   import { appState } from '$lib/stores/appState.svelte.js';
+  import { t } from '$lib/i18n/index.js';
 
   let graphData = $state({ nodes: [], edges: [] });
   let loading = $state(true);
@@ -40,11 +41,11 @@
     <button onclick={() => goto('/dashboard')} style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;">
       <Icon name="chevLeft" size={18} />
     </button>
-    <h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-0.3px;">Graph-Ansicht</h2>
-    <span style="font-size:12px;color:#888899;">{filteredNodes.length} Notizen · {graphData.edges.length} Verbindungen</span>
+    <h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-0.3px;">{t('graph.title')}</h2>
+    <span style="font-size:12px;color:#888899;">{filteredNodes.length} {t('graph.notes')} · {graphData.edges.length} {t('graph.connections')}</span>
     <span style="flex:1;"></span>
     <button onclick={() => graphViewRef?.reheat()} style="display:flex;align-items:center;gap:6px;height:34px;padding:0 10px;font-size:12px;font-weight:500;color:#1a1a2e;border:1px solid rgba(26,26,46,0.10);border-radius:8px;background:#fff;cursor:pointer;font-family:inherit;">
-      <Icon name="refresh" size={13} /> Neu anordnen
+      <Icon name="refresh" size={13} /> {t('graph.rearrange')}
     </button>
     <div style="width:34px;height:34px;border-radius:17px;background:linear-gradient(135deg,#1a1a2e,#2d2d4a);color:#fff;font-weight:600;font-size:12px;display:flex;align-items:center;justify-content:center;">
       {appState.currentUser?.username?.slice(0,2).toUpperCase() ?? 'MN'}
@@ -57,7 +58,7 @@
       <Icon name="search" size={14} color="#888899" />
       <input
         bind:value={searchQuery}
-        placeholder="Im Graphen suchen…"
+        placeholder={t('graph.searchPlaceholder')}
         style="flex:1;border:none;background:transparent;outline:none;font-size:12.5px;color:#1a1a2e;font-family:inherit;min-width:0;"
       />
     </div>
@@ -65,7 +66,7 @@
     <span style="flex:1;"></span>
 
     <div style="font-size:10.5px;color:#888899;border-top:1px solid rgba(26,26,46,0.06);padding-top:10px;">
-      <strong style="color:#1a1a2e;">Tipp:</strong> Klicke auf einen Node, um zur Notiz zu springen. Ziehe Nodes um sie neu zu positionieren.
+      <strong style="color:#1a1a2e;">{t('graph.tipLabel')}</strong> {t('graph.tip')}
     </div>
   </div>
 
@@ -74,7 +75,7 @@
     <div style="position:relative;width:100%;height:100%;">
       {#if loading}
         <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888899;font-size:14px;">
-          Graph wird geladen…
+          {t('graph.loading')}
         </div>
       {:else}
         <GraphView bind:this={graphViewRef} nodes={filteredNodes} edges={graphData.edges} />

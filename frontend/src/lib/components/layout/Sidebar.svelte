@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
   import Icon from '$lib/components/ui/Icon.svelte';
   import { appState, logout } from '$lib/stores/appState.svelte.js';
+  import { t } from '$lib/i18n/index.js';
   import * as api from '$lib/services/api.js';
 
   let { onNewNote = () => {} } = $props();
@@ -47,10 +48,11 @@
     }
   });
 
+  // Nur Keys speichern – t() muss im Markup laufen, sonst friert die Übersetzung ein
   const navLinks = [
-    { ic: 'home', label: 'Dashboard', href: '/dashboard' },
-    { ic: 'graph', label: 'Graph', href: '/graph' },
-    { ic: 'settings', label: 'Einstellungen', href: '/settings' },
+    { ic: 'home', key: 'nav.dashboard', href: '/dashboard' },
+    { ic: 'graph', key: 'nav.graph', href: '/graph' },
+    { ic: 'settings', key: 'nav.settings', href: '/settings' },
   ];
 
   function toggleFolder(id, event) {
@@ -74,13 +76,13 @@
       creatingFolder = false;
       await loadFolders();
     } catch (e) {
-      folderError = e.message || 'Ordner konnte nicht erstellt werden.';
+      folderError = e.message || t('sidebar.folderCreateError');
     }
   }
 
   async function removeFolder(folder, event) {
     event.stopPropagation();
-    if (!confirm(`Ordner "${folder.name}" löschen? Die Notizen bleiben erhalten und erscheinen unter "Alle Notizen".`)) return;
+    if (!confirm(t('sidebar.deleteFolderConfirm', { name: folder.name }))) return;
     try {
       await api.deleteFolder(folder.id);
       await loadFolders();
@@ -111,17 +113,17 @@
   <div style="padding:4px 10px 12px;">
     <a href="/dashboard" style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:7px;cursor:pointer;background:{onDashboard && !activeFolderId ? 'rgba(233,69,96,0.14)' : 'transparent'};color:{onDashboard && !activeFolderId ? '#fff' : 'rgba(255,255,255,0.78)'};font-size:13px;font-weight:500;border-left:{onDashboard && !activeFolderId ? '2px solid #e94560' : '2px solid transparent'};padding-left:{onDashboard && !activeFolderId ? '8px' : '10px'};text-decoration:none;">
       <Icon name="inbox" size={15} />
-      <span style="flex:1;">Alle Notizen</span>
+      <span style="flex:1;">{t('sidebar.allNotes')}</span>
     </a>
   </div>
 
   <!-- Ordner -->
   <div style="padding:6px 10px 10px;overflow-y:auto;">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px;">
-      <span style="font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.8px;text-transform:uppercase;">Ordner</span>
+      <span style="font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.8px;text-transform:uppercase;">{t('sidebar.folders')}</span>
       <button
         onclick={() => { creatingFolder = !creatingFolder; folderError = ''; }}
-        title="Neuen Ordner erstellen" aria-label="Neuen Ordner erstellen"
+        title={t('sidebar.newFolder')} aria-label={t('sidebar.newFolder')}
         style="background:none;border:none;cursor:pointer;padding:2px;border-radius:4px;display:flex;"
       >
         <Icon name={creatingFolder ? 'x' : 'plus'} size={13} color="rgba(255,255,255,0.6)" />
@@ -134,7 +136,7 @@
         <input
           bind:value={newFolderName}
           onkeydown={(e) => { if (e.key === 'Enter') createFolder(); if (e.key === 'Escape') { creatingFolder = false; newFolderName = ''; } }}
-          placeholder="Ordnername…"
+          placeholder={t('sidebar.folderNamePlaceholder')}
           autofocus
           style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;font-size:12.5px;color:#fff;outline:none;font-family:inherit;"
         />
@@ -153,7 +155,7 @@
           style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;color:{activeFolderId === folder.id ? '#fff' : 'rgba(255,255,255,0.78)'};background:{activeFolderId === folder.id ? 'rgba(233,69,96,0.14)' : 'transparent'};font-size:12.5px;font-weight:500;width:100%;box-sizing:border-box;"
         >
           {#if folder.children?.length}
-            <button onclick={(e) => toggleFolder(folder.id, e)} aria-label="Unterordner anzeigen" style="background:none;border:none;cursor:pointer;padding:0;display:flex;">
+            <button onclick={(e) => toggleFolder(folder.id, e)} aria-label={t('sidebar.showSubfolders')} style="background:none;border:none;cursor:pointer;padding:0;display:flex;">
               <Icon name={openFolders.has(folder.id) ? 'chevDown' : 'chevRight'} size={12} color="rgba(255,255,255,0.5)" />
             </button>
           {:else}
@@ -163,7 +165,7 @@
           <span style="flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{folder.name}</span>
           <button
             onclick={(e) => removeFolder(folder, e)}
-            title="Ordner löschen" aria-label="Ordner löschen"
+            title={t('sidebar.deleteFolder')} aria-label={t('sidebar.deleteFolder')}
             style="background:none;border:none;cursor:pointer;padding:2px;border-radius:4px;display:flex;opacity:0.35;"
           >
             <Icon name="trash" size={12} color="#fff" />
@@ -181,7 +183,7 @@
               <span style="flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{child.name}</span>
               <button
                 onclick={(e) => removeFolder(child, e)}
-                title="Ordner löschen" aria-label="Ordner löschen"
+                title={t('sidebar.deleteFolder')} aria-label={t('sidebar.deleteFolder')}
                 style="background:none;border:none;cursor:pointer;padding:2px;border-radius:4px;display:flex;opacity:0.35;"
               >
                 <Icon name="trash" size={12} color="#fff" />
@@ -192,13 +194,13 @@
       </div>
     {/each}
     {#if !appState.folders?.length && !creatingFolder}
-      <div style="font-size:11.5px;color:rgba(255,255,255,0.35);padding:4px 8px;">Noch keine Ordner — mit + erstellen.</div>
+      <div style="font-size:11.5px;color:rgba(255,255,255,0.35);padding:4px 8px;">{t('sidebar.noFolders')}</div>
     {/if}
   </div>
 
   <!-- Tags -->
   <div style="padding:6px 10px 10px;">
-    <div style="font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.8px;text-transform:uppercase;padding:6px 8px;">Tags</div>
+    <div style="font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.45);letter-spacing:0.8px;text-transform:uppercase;padding:6px 8px;">{t('sidebar.tags')}</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 8px 0;">
       {#each appState.tags ?? [] as tag (tag.id ?? tag.name)}
         <span style="font-size:11px;padding:3px 8px;border-radius:10px;background:oklch(0.32 0.07 {tag.hue ?? 200});color:oklch(0.92 0.08 {tag.hue ?? 200});border:1px solid oklch(0.42 0.10 {tag.hue ?? 200} / 0.6);display:inline-flex;align-items:center;gap:4px;font-weight:500;">
@@ -206,7 +208,7 @@
         </span>
       {/each}
       {#if !appState.tags?.length}
-        <span style="font-size:11.5px;color:rgba(255,255,255,0.35);">Noch keine Tags.</span>
+        <span style="font-size:11.5px;color:rgba(255,255,255,0.35);">{t('sidebar.noTags')}</span>
       {/if}
     </div>
   </div>
@@ -218,7 +220,7 @@
     {#each navLinks as link}
       <a href={link.href} style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:7px;color:rgba(255,255,255,0.55);font-size:12.5px;font-weight:500;text-decoration:none;">
         <Icon name={link.ic} size={14} color="rgba(255,255,255,0.5)" />
-        {link.label}
+        {t(link.key)}
       </a>
     {/each}
   </div>
@@ -234,7 +236,7 @@
           <div style="font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{appState.currentUser.username}</div>
           <div style="color:rgba(255,255,255,0.5);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{appState.currentUser.email}</div>
         </div>
-        <button onclick={handleLogout} style="background:none;border:none;cursor:pointer;padding:2px;border-radius:4px;" title="Abmelden" aria-label="Abmelden">
+        <button onclick={handleLogout} style="background:none;border:none;cursor:pointer;padding:2px;border-radius:4px;" title={t('sidebar.logout')} aria-label={t('sidebar.logout')}>
           <Icon name="arrowRight" size={14} color="rgba(255,255,255,0.5)" />
         </button>
       </div>

@@ -1,20 +1,22 @@
 <script>
   import Icon from '$lib/components/ui/Icon.svelte';
+  import { t } from '$lib/i18n/index.js';
 
   let { onFormat = () => {}, onInsertLink = () => {} } = $props();
 
+  // Nur Keys speichern – t() muss im Markup laufen, sonst friert die Übersetzung ein
   const tools = [
-    { ic: 'bold', label: 'Fett', shortcut: '⌘B', syntax: '**' },
-    { ic: 'italic', label: 'Kursiv', shortcut: '⌘I', syntax: '*' },
+    { ic: 'bold', key: 'editor.tools.bold', shortcut: '⌘B', syntax: '**' },
+    { ic: 'italic', key: 'editor.tools.italic', shortcut: '⌘I', syntax: '*' },
     null,
-    { ic: 'h1', label: 'Überschrift 1', prefix: '# ' },
-    { ic: 'h2', label: 'Überschrift 2', prefix: '## ' },
-    { ic: 'h3', label: 'Überschrift 3', prefix: '### ' },
+    { ic: 'h1', key: 'editor.tools.h1', prefix: '# ' },
+    { ic: 'h2', key: 'editor.tools.h2', prefix: '## ' },
+    { ic: 'h3', key: 'editor.tools.h3', prefix: '### ' },
     null,
-    { ic: 'list', label: 'Liste', prefix: '- ' },
-    { ic: 'quote', label: 'Zitat', prefix: '> ' },
-    { ic: 'code', label: 'Code', syntax: '`' },
-    { ic: 'link', label: 'Link', shortcut: '⌘K' },
+    { ic: 'list', key: 'editor.tools.list', prefix: '- ' },
+    { ic: 'quote', key: 'editor.tools.quote', prefix: '> ' },
+    { ic: 'code', key: 'editor.tools.code', syntax: '`' },
+    { ic: 'link', key: 'editor.tools.link', shortcut: '⌘K' },
     null,
   ];
 </script>
@@ -25,7 +27,7 @@
       <div style="width:1px;height:18px;background:rgba(26,26,46,0.08);margin:0 4px;"></div>
     {:else}
       <button
-        title="{tool.label}{tool.shortcut ? ' (' + tool.shortcut + ')' : ''}"
+        title="{t(tool.key)}{tool.shortcut ? ' (' + tool.shortcut + ')' : ''}"
         onclick={() => onFormat(tool)}
         style="width:30px;height:30px;border:none;background:transparent;color:#6b6b80;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;"
         onmouseenter={(e) => e.currentTarget.style.background = '#f1f0ec'}
