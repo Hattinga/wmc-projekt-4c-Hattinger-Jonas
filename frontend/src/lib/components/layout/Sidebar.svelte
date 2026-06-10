@@ -12,6 +12,9 @@
   let creatingFolder = $state(false);
   let newFolderName = $state('');
   let folderError = $state('');
+  let creatingSubfolderId = $state(null);
+  let newSubfolderName = $state('');
+  let subfolderError = $state('');
 
   // Aktiver Ordner-Filter aus der Dashboard-URL (?folder=<id>)
   let activeFolderId = $derived(Number($page.url.searchParams.get('folder')) || null);
@@ -77,6 +80,30 @@
       await loadFolders();
     } catch (e) {
       folderError = e.message || t('sidebar.folderCreateError');
+    }
+  }
+
+  function toggleSubfolderInput(folderId, event) {
+    event.stopPropagation();
+    creatingSubfolderId = creatingSubfolderId === folderId ? null : folderId;
+    newSubfolderName = '';
+    subfolderError = '';
+  }
+
+  async function createSubfolder(parentId) {
+    const name = newSubfolderName.trim();
+    if (!name) return;
+    subfolderError = '';
+    try {
+      await api.createFolder({ name, parentId });
+      newSubfolderName = '';
+      creatingSubfolderId = null;
+      // Parent direkt aufklappen, damit der neue Unterordner sichtbar ist
+      openFolders.add(parentId);
+      openFolders = new Set(openFolders);
+      await loadFolders();
+    } catch (e) {
+      subfolderError = e.message || t('sidebar.folderCreateError');
     }
   }
 
@@ -164,6 +191,13 @@
           <Icon name={openFolders.has(folder.id) ? 'folderOpen' : 'folder'} size={14} color={folder.color || 'rgba(255,255,255,0.6)'} />
           <span style="flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{folder.name}</span>
           <button
+            onclick={(e) => toggleSubfolderInput(folder.id, e)}
+            title={t('sidebar.newSubfolder')} aria-label={t('sidebar.newSubfolder')}
+            style="background:none;border:none;cursor:pointer;padding:2px;border-radius:4px;display:flex;opacity:0.35;"
+          >
+            <Icon name={creatingSubfolderId === folder.id ? 'x' : 'plus'} size={12} color="#fff" />
+          </button>
+          <button
             onclick={(e) => removeFolder(folder, e)}
             title={t('sidebar.deleteFolder')} aria-label={t('sidebar.deleteFolder')}
             style="background:none;border:none;cursor:pointer;padding:2px;border-radius:4px;display:flex;opacity:0.35;"
@@ -171,6 +205,21 @@
             <Icon name="trash" size={12} color="#fff" />
           </button>
         </div>
+        {#if creatingSubfolderId === folder.id}
+          <div style="padding:2px 8px 6px 34px;">
+            <!-- svelte-ignore a11y_autofocus -->
+            <input
+              bind:value={newSubfolderName}
+              onkeydown={(e) => { if (e.key === 'Enter') createSubfolder(folder.id); if (e.key === 'Escape') { creatingSubfolderId = null; newSubfolderName = ''; } }}
+              placeholder={t('sidebar.folderNamePlaceholder')}
+              autofocus
+              style="width:100%;box-sizing:border-box;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 8px;font-size:12px;color:#fff;outline:none;font-family:inherit;"
+            />
+            {#if subfolderError}
+              <div style="font-size:11px;color:#ff8896;padding:4px 2px 0;">{subfolderError}</div>
+            {/if}
+          </div>
+        {/if}
         {#if openFolders.has(folder.id) && folder.children?.length}
           {#each folder.children as child (child.id)}
             <div

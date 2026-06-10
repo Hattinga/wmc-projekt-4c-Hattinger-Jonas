@@ -39,6 +39,7 @@
     "allNotes": "Alle Notizen",
     "folders": "Ordner",
     "newFolder": "Neuen Ordner erstellen",
+    "newSubfolder": "Unterordner erstellen",
     "folderNamePlaceholder": "Ordnername…",
     "folderCreateError": "Ordner konnte nicht erstellt werden.",
     "noFolders": "Noch keine Ordner — mit + erstellen.",

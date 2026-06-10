@@ -39,6 +39,7 @@
     "allNotes": "All notes",
     "folders": "Folders",
     "newFolder": "Create new folder",
+    "newSubfolder": "Create subfolder",
     "folderNamePlaceholder": "Folder name…",
     "folderCreateError": "Folder could not be created.",
     "noFolders": "No folders yet — create one with +.",
