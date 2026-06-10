@@ -6,6 +6,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Theme-Tokens (Light = Default, .dark am <html> überschreibt) ───
+   Dark-Werte sind desaturierte Ableger der Marke (#1a1a2e-Familie),
+   kein pures Schwarz, kein invertiertes Licht-Theme. */
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --surface-glass: rgba(255, 255, 255, 0.85);
+  --bg-muted: #f6f5f2;
+  --text: #1a1a2e;
+  --text-secondary: #6b6b80;
+  --text-muted: #888899;
+  --border: rgba(26, 26, 46, 0.08);
+  --border-strong: rgba(26, 26, 46, 0.12);
+  --graph-edge: rgba(26, 26, 46, 0.18);
+  --scrollbar: rgba(26, 26, 46, 0.15);
+  --scrollbar-hover: rgba(26, 26, 46, 0.25);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #14141c;
+  --surface: #1c1c26;
+  --surface-glass: rgba(28, 28, 38, 0.85);
+  --bg-muted: #26262f;
+  --text: #e8e8f0;
+  --text-secondary: #a8a8bc;
+  --text-muted: #8a8a9e;
+  --border: rgba(232, 232, 240, 0.08);
+  --border-strong: rgba(232, 232, 240, 0.16);
+  --graph-edge: rgba(232, 232, 240, 0.22);
+  --scrollbar: rgba(232, 232, 240, 0.15);
+  --scrollbar-hover: rgba(232, 232, 240, 0.25);
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+}
+
 /* Global Reset + Base */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -29,11 +68,11 @@ html, body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(26, 26, 46, 0.15);
+  background: var(--scrollbar);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(26, 26, 46, 0.25);
+  background: var(--scrollbar-hover);
 }
 
 /* ─── Auth page animations ─── */

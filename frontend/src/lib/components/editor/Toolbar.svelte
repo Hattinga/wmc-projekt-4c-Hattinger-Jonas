@@ -21,16 +21,16 @@
   ];
 </script>
 
-<div style="height:44px;border-bottom:1px solid rgba(26,26,46,0.06);display:flex;align-items:center;padding:0 12px;gap:2px;flex-shrink:0;background:#fff;">
+<div style="height:44px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:2px;flex-shrink:0;background:var(--surface);">
   {#each tools as tool, i}
     {#if tool === null}
-      <div style="width:1px;height:18px;background:rgba(26,26,46,0.08);margin:0 4px;"></div>
+      <div style="width:1px;height:18px;background:var(--border);margin:0 4px;"></div>
     {:else}
       <button
         title="{t(tool.key)}{tool.shortcut ? ' (' + tool.shortcut + ')' : ''}"
         onclick={() => onFormat(tool)}
-        style="width:30px;height:30px;border:none;background:transparent;color:#6b6b80;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;"
-        onmouseenter={(e) => e.currentTarget.style.background = '#f1f0ec'}
+        style="width:30px;height:30px;border:none;background:transparent;color:var(--text-secondary);cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;"
+        onmouseenter={(e) => e.currentTarget.style.background = 'var(--bg-muted)'}
         onmouseleave={(e) => e.currentTarget.style.background = 'transparent'}
       >
         <Icon name={tool.ic} size={15} />

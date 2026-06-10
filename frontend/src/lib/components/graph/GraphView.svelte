@@ -142,7 +142,7 @@
 >
   <defs>
     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-      <circle cx="20" cy="20" r="0.8" fill="rgba(26,26,46,0.07)" />
+      <circle cx="20" cy="20" r="0.8" style="fill:var(--border);" />
     </pattern>
     <radialGradient id="hoverGlow">
       <stop offset="0%" stop-color="rgba(233,69,96,0.25)" />
@@ -157,7 +157,7 @@
         <line
           x1={e.source.x} y1={e.source.y}
           x2={e.target.x} y2={e.target.y}
-          stroke={isEdgeHighlighted(e) ? '#e94560' : 'rgba(26,26,46,0.18)'}
+          style="stroke:{isEdgeHighlighted(e) ? '#e94560' : 'var(--graph-edge)'};"
           stroke-width={isEdgeHighlighted(e) ? 1.6 : 1}
           opacity={hovered && !isEdgeHighlighted(e) ? 0.3 : 1}
         />
@@ -183,7 +183,7 @@
             r={r}
             fill={color}
             opacity={isConnected(n.id) ? 1 : 0.3}
-            stroke={hovered === n.id ? '#fff' : 'rgba(26,26,46,0.08)'}
+            style="stroke:{hovered === n.id ? 'var(--surface)' : 'var(--border)'};"
             stroke-width={hovered === n.id ? 3 : 1.5}
           />
           <text
@@ -192,9 +192,8 @@
             text-anchor="middle"
             font-size={r > 18 ? 12 : 11}
             font-weight={hovered === n.id ? 600 : 500}
-            fill={hovered === n.id ? '#1a1a2e' : 'rgba(26,26,46,0.75)'}
             opacity={isConnected(n.id) ? 1 : 0.4}
-            style="pointer-events:none;font-family:Inter,system-ui,sans-serif;"
+            style="pointer-events:none;font-family:Inter,system-ui,sans-serif;fill:{hovered === n.id ? 'var(--text)' : 'var(--text-secondary)'};"
           >{n.title}</text>
         </g>
       {/if}

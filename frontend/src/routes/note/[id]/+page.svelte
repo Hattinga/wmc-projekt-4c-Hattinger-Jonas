@@ -191,7 +191,7 @@
   }
 </script>
 
-<div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:Inter,system-ui,sans-serif;background:#fff;overflow:hidden;color:#1a1a2e;">
+<div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:Inter,system-ui,sans-serif;background:var(--surface);overflow:hidden;color:var(--text);">
 
   {#if loadError}
     <div style="padding:14px 20px;background:rgba(233,69,96,0.08);border-bottom:1px solid rgba(233,69,96,0.20);font-size:13px;color:#e94560;font-weight:500;">
@@ -200,15 +200,15 @@
   {/if}
 
   <!-- Topbar -->
-  <div class="pl-14 pr-4 sm:px-4" style="height:52px;border-bottom:1px solid rgba(26,26,46,0.08);display:flex;align-items:center;gap:12px;flex-shrink:0;">
-    <button onclick={() => goto('/dashboard')} style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+  <div class="pl-14 pr-4 sm:px-4" style="height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;">
+    <button onclick={() => goto('/dashboard')} style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;">
       <Icon name="chevLeft" size={18} />
     </button>
-    <div class="hidden sm:flex" style="align-items:center;gap:6px;font-size:12.5px;color:#888899;">
+    <div class="hidden sm:flex" style="align-items:center;gap:6px;font-size:12.5px;color:var(--text-muted);">
       <Icon name="folder" size={13} color="#4ea8de" />
       <span>{note?.folder || 'Notizen'}</span>
       <Icon name="chevRight" size={11} />
-      <span style="color:#1a1a2e;font-weight:500;">{title || '…'}</span>
+      <span style="color:var(--text);font-weight:500;">{title || '…'}</span>
     </div>
     <span style="flex:1;"></span>
 
@@ -219,9 +219,9 @@
         {saveError}
       </div>
     {:else if saving || savedAt}
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:12px;background:{saving ? 'rgba(136,136,153,0.08)' : 'rgba(42,157,110,0.08)'};color:{saving ? '#888899' : '#2a9d6e'};">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:12px;background:{saving ? 'rgba(136,136,153,0.08)' : 'rgba(42,157,110,0.08)'};color:{saving ? 'var(--text-muted)' : '#2a9d6e'};">
         {#if saving}
-          <span style="width:12px;height:12px;border:2px solid #ccc;border-top-color:#888899;border-radius:50%;display:inline-block;animation:spin 0.7s linear infinite;"></span>
+          <span style="width:12px;height:12px;border:2px solid #ccc;border-top-color:var(--text-muted);border-radius:50%;display:inline-block;animation:spin 0.7s linear infinite;"></span>
           {t('editor.saving')}
         {:else}
           <Icon name="check" size={12} color="#2a9d6e" strokeWidth={2.5} />
@@ -247,19 +247,19 @@
     <input
       bind:value={title}
       placeholder={t('editor.titlePlaceholder')}
-      style="width:100%;border:none;outline:none;font-size:28px;font-weight:700;letter-spacing:-0.6px;color:#1a1a2e;font-family:inherit;background:transparent;padding:0;"
+      style="width:100%;border:none;outline:none;font-size:28px;font-weight:700;letter-spacing:-0.6px;color:var(--text);font-family:inherit;background:transparent;padding:0;"
     />
   </div>
 
   <!-- Tags -->
   <div class="px-4 sm:px-7" style="padding-top:10px;padding-bottom:4px;flex-shrink:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
     {#each note?.tags ?? [] as tag (tag.id)}
-      <span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:3px 6px 3px 9px;border-radius:12px;background:#f6f5f2;border:1px solid rgba(26,26,46,0.10);color:#6b6b80;font-weight:500;">
+      <span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:3px 6px 3px 9px;border-radius:12px;background:var(--bg-muted);border:1px solid var(--border-strong);color:var(--text-secondary);font-weight:500;">
         #{tag.name}
         <button
           onclick={() => removeTag(tag)}
           title={t('editor.removeTag')} aria-label={t('editor.removeTag')}
-          style="border:none;background:transparent;cursor:pointer;padding:0;display:flex;color:#888899;"
+          style="border:none;background:transparent;cursor:pointer;padding:0;display:flex;color:var(--text-muted);"
         ><Icon name="x" size={10} /></button>
       </span>
     {/each}
@@ -267,7 +267,7 @@
       bind:value={tagInput}
       onkeydown={(e) => { if (e.key === 'Enter') addTag(); }}
       placeholder={t('editor.addTag')}
-      style="border:none;outline:none;background:transparent;font-size:11.5px;color:#1a1a2e;font-family:inherit;width:90px;padding:3px 0;"
+      style="border:none;outline:none;background:transparent;font-size:11.5px;color:var(--text);font-family:inherit;width:90px;padding:3px 0;"
     />
     {#if tagError}
       <span style="font-size:11px;color:#e94560;">{tagError}</span>

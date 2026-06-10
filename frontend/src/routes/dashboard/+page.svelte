@@ -79,19 +79,19 @@
   }
 </script>
 
-<div style="width:100%;height:100%;display:flex;font-family:Inter,system-ui,sans-serif;overflow:hidden;background:#fff;color:#1a1a2e;">
+<div style="width:100%;height:100%;display:flex;font-family:Inter,system-ui,sans-serif;overflow:hidden;background:var(--surface);color:var(--text);">
 
   <!-- Center: Topbar + Note list -->
   <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
 
     <!-- Topbar -->
-    <div class="pl-14 pr-5 sm:px-5" style="height:56px;border-bottom:1px solid rgba(26,26,46,0.08);display:flex;align-items:center;gap:16px;background:#fff;flex-shrink:0;">
-      <div style="flex:1;max-width:420px;display:flex;align-items:center;gap:10px;background:#f6f5f2;border-radius:8px;padding:0 12px;height:36px;">
+    <div class="pl-14 pr-5 sm:px-5" style="height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;background:var(--surface);flex-shrink:0;">
+      <div style="flex:1;max-width:420px;display:flex;align-items:center;gap:10px;background:var(--bg-muted);border-radius:8px;padding:0 12px;height:36px;">
         <Icon name="search" size={15} color="#888899" />
         <input
           bind:value={appState.searchQuery}
           placeholder={t('dashboard.searchPlaceholder')}
-          style="flex:1;border:none;background:transparent;outline:none;font-size:13px;color:#1a1a2e;font-family:inherit;"
+          style="flex:1;border:none;background:transparent;outline:none;font-size:13px;color:var(--text);font-family:inherit;"
         />
       </div>
       <div style="flex:1;"></div>
@@ -106,9 +106,9 @@
           <Icon name="chevDown" size={11} color="#888899" />
         </button>
         {#if langOpen}
-          <div style="position:absolute;top:calc(100% + 4px);right:0;background:#fff;border:1px solid rgba(26,26,46,0.10);border-radius:8px;padding:4px;min-width:110px;box-shadow:0 8px 24px rgba(26,26,46,0.10);z-index:50;">
+          <div style="position:absolute;top:calc(100% + 4px);right:0;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;padding:4px;min-width:110px;box-shadow:0 8px 24px var(--border-strong);z-index:50;">
             {#each [['de', '🇩🇪', 'Deutsch'], ['en', '🇬🇧', 'English']] as [code, flag, label]}
-              <button onclick={() => { setLocale(code); langOpen = false; }} style="display:flex;align-items:center;gap:8px;width:100%;border:none;background:{appState.locale === code ? '#f6f5f2' : 'transparent'};padding:7px 10px;border-radius:5px;font-size:12.5px;font-weight:500;color:#1a1a2e;cursor:pointer;font-family:inherit;">
+              <button onclick={() => { setLocale(code); langOpen = false; }} style="display:flex;align-items:center;gap:8px;width:100%;border:none;background:{appState.locale === code ? 'var(--bg-muted)' : 'transparent'};padding:7px 10px;border-radius:5px;font-size:12.5px;font-weight:500;color:var(--text);cursor:pointer;font-family:inherit;">
                 {flag} {label}
               </button>
             {/each}
@@ -125,24 +125,24 @@
     <div style="flex:1;display:flex;min-height:0;">
 
       <!-- Note list column -->
-      <div class="w-full sm:w-[360px] flex flex-col min-h-0 shrink-0" style="border-right:1px solid rgba(26,26,46,0.08);">
+      <div class="w-full sm:w-[360px] flex flex-col min-h-0 shrink-0" style="border-right:1px solid var(--border);">
         <div style="padding:20px 20px 14px;">
           <div style="display:flex;align-items:baseline;justify-content:space-between;">
             <h2 style="margin:0;font-size:19px;font-weight:700;letter-spacing:-0.4px;display:flex;align-items:center;gap:8px;">
               {activeFolder ? activeFolder.name : t('dashboard.allNotes')}
               {#if activeFolderId}
-                <button onclick={() => goto('/dashboard')} title={t('dashboard.removeFilter')} aria-label={t('dashboard.removeFilter')} style="border:1px solid rgba(26,26,46,0.12);background:#f6f5f2;color:#6b6b80;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;">
+                <button onclick={() => goto('/dashboard')} title={t('dashboard.removeFilter')} aria-label={t('dashboard.removeFilter')} style="border:1px solid var(--border-strong);background:var(--bg-muted);color:var(--text-secondary);border-radius:10px;padding:2px 8px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;">
                   <Icon name="x" size={10} /> {t('dashboard.filter')}
                 </button>
               {/if}
             </h2>
-            <span style="font-size:12px;color:#888899;">{filteredNotes.length} {t('dashboard.entries')}</span>
+            <span style="font-size:12px;color:var(--text-muted);">{filteredNotes.length} {t('dashboard.entries')}</span>
           </div>
           <div style="display:flex;gap:6px;margin-top:12px;font-size:12px;">
             {#each [['updated', t('dashboard.sortUpdated')], ['alpha', t('dashboard.sortAlpha')]] as [key, label]}
               <button
                 onclick={() => sortBy = key}
-                style="border:1px solid rgba(26,26,46,0.10);background:{sortBy === key ? '#1a1a2e' : '#fff'};color:{sortBy === key ? '#fff' : '#1a1a2e'};padding:4px 10px;border-radius:14px;font-size:11.5px;font-weight:500;cursor:pointer;font-family:inherit;"
+                style="border:1px solid var(--border-strong);background:{sortBy === key ? 'var(--text)' : 'var(--surface)'};color:{sortBy === key ? 'var(--surface)' : 'var(--text)'};padding:4px 10px;border-radius:14px;font-size:11.5px;font-weight:500;cursor:pointer;font-family:inherit;"
               >{label}</button>
             {/each}
           </div>
@@ -156,7 +156,7 @@
             }} />
           {/each}
           {#if filteredNotes.length === 0}
-            <div style="padding:32px 16px;text-align:center;color:#888899;font-size:13px;">
+            <div style="padding:32px 16px;text-align:center;color:var(--text-muted);font-size:13px;">
               {notes.length === 0 ? t('dashboard.emptyNoNotes') : t('dashboard.emptyNotFound')}
             </div>
           {/if}
@@ -164,14 +164,14 @@
       </div>
 
       <!-- Preview column (auf Mobile ausgeblendet – NoteCard navigiert dort direkt) -->
-      <div class="hidden sm:block" style="flex:1;overflow:auto;padding:32px;min-width:0;background:#fafaf8;">
+      <div class="hidden sm:block" style="flex:1;overflow:auto;padding:32px;min-width:0;background:var(--bg);">
         {#if selectedNote}
           <div style="max-width:640px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
               <div style="width:8px;height:8px;border-radius:4px;background:{selectedNote.color || '#7c9eb2'};"></div>
-              <span style="font-size:12px;color:#888899;font-weight:500;">{selectedNote.folder || 'Notizen'}</span>
+              <span style="font-size:12px;color:var(--text-muted);font-weight:500;">{selectedNote.folder || 'Notizen'}</span>
               <span style="color:#cccfd7;">·</span>
-              <span style="font-size:12px;color:#888899;">{formatDate(selectedNote.updated_at)}</span>
+              <span style="font-size:12px;color:var(--text-muted);">{formatDate(selectedNote.updated_at)}</span>
               <span style="flex:1;"></span>
               <button onclick={() => goto(`/note/${selectedNote.id}`)} style="height:32px;padding:0 12px;border:none;border-radius:8px;background:#e94560;color:#fff;font-weight:600;font-size:12px;cursor:pointer;font-family:inherit;">{t('dashboard.open')}</button>
             </div>
@@ -179,25 +179,25 @@
             {#if selectedNote.tags?.length}
               <div style="display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;">
                 {#each selectedNote.tags as tag}
-                  <span style="font-size:11.5px;padding:3px 9px;border-radius:12px;background:#fff;border:1px solid rgba(26,26,46,0.10);color:#6b6b80;font-weight:500;">#{typeof tag === 'string' ? tag : tag.name}</span>
+                  <span style="font-size:11.5px;padding:3px 9px;border-radius:12px;background:var(--surface);border:1px solid var(--border-strong);color:var(--text-secondary);font-weight:500;">#{typeof tag === 'string' ? tag : tag.name}</span>
                 {/each}
               </div>
             {/if}
-            <div style="font-size:14.5px;line-height:1.65;color:#1a1a2e;">
+            <div style="font-size:14.5px;line-height:1.65;color:var(--text);">
               {@html formatWikiLinks(selectedNote.content?.slice(0, 300))}
             </div>
-            <div style="margin-top:28px;padding:16px;background:#fff;border:1px solid rgba(26,26,46,0.08);border-radius:10px;">
+            <div style="margin-top:28px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;">
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
                 <Icon name="link2" size={14} color="#e94560" />
-                <span style="font-size:12.5px;font-weight:600;color:#1a1a2e;">{selectedNote.backlinks ?? 0} {t('dashboard.backlinks')}</span>
+                <span style="font-size:12.5px;font-weight:600;color:var(--text);">{selectedNote.backlinks ?? 0} {t('dashboard.backlinks')}</span>
               </div>
               {#if !selectedNote.backlinks}
-                <div style="font-size:12px;color:#888899;">{t('dashboard.noBacklinks')}</div>
+                <div style="font-size:12px;color:var(--text-muted);">{t('dashboard.noBacklinks')}</div>
               {/if}
             </div>
           </div>
         {:else if notes.length === 0}
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#888899;gap:12px;">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:12px;">
             <Icon name="penLine" size={32} color="#cccfd7" />
             <p style="margin:0;font-size:14px;">{t('dashboard.emptyFirstNote')}</p>
           </div>

@@ -100,12 +100,12 @@
 </script>
 
 <!-- Linke Seite: Markdown-Source -->
-<div class="flex-1 flex flex-col min-w-0 min-h-0 border-b sm:border-b-0 sm:border-r border-[rgba(26,26,46,0.08)]">
+<div class="flex-1 flex flex-col min-w-0 min-h-0 border-b sm:border-b-0 sm:border-r border-[var(--border)]">
   <!-- Pane header -->
-  <div style="height:36px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid rgba(26,26,46,0.06);background:#fafaf8;flex-shrink:0;">
-    <span style="font-size:10.5px;font-weight:600;color:#888899;letter-spacing:0.8px;text-transform:uppercase;">{t('editor.markdown')}</span>
+  <div style="height:36px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;">
+    <span style="font-size:10.5px;font-weight:600;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;">{t('editor.markdown')}</span>
     <span style="flex:1;"></span>
-    <span style="font-size:11px;color:#888899;">{wordCount} {t('editor.words')}</span>
+    <span style="font-size:11px;color:var(--text-muted);">{wordCount} {t('editor.words')}</span>
   </div>
 
   <!-- Textarea -->
@@ -117,22 +117,22 @@
       onkeydown={handleKeydown}
       onblur={closeAutocomplete}
       spellcheck="true"
-      style="width:100%;height:100%;border:none;outline:none;resize:none;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:13px;line-height:1.65;color:#1a1a2e;background:transparent;box-sizing:border-box;"
+      style="width:100%;height:100%;border:none;outline:none;resize:none;font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-size:13px;line-height:1.65;color:var(--text);background:transparent;box-sizing:border-box;"
     ></textarea>
 
     <!-- [[Note]] Autocomplete -->
     {#if autocompleteOpen && suggestions.length > 0}
-      <div class="max-w-[calc(100vw-2rem)]" style="position:absolute;top:218px;left:188px;background:#fff;border:1px solid rgba(26,26,46,0.10);border-radius:8px;padding:4px;min-width:240px;box-shadow:0 10px 30px rgba(26,26,46,0.12);z-index:3;">
-        <div style="font-size:10.5px;font-weight:600;color:#888899;padding:6px 10px;letter-spacing:0.5px;text-transform:uppercase;">{t('editor.insertNote')}</div>
+      <div class="max-w-[calc(100vw-2rem)]" style="position:absolute;top:218px;left:188px;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;padding:4px;min-width:240px;box-shadow:0 10px 30px var(--border-strong);z-index:3;">
+        <div style="font-size:10.5px;font-weight:600;color:var(--text-muted);padding:6px 10px;letter-spacing:0.5px;text-transform:uppercase;">{t('editor.insertNote')}</div>
         {#each suggestions as note, i}
           <button
             onmousedown={(e) => { e.preventDefault(); insertLink(note.title); }}
             style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:5px;cursor:pointer;background:{i === 0 ? 'rgba(233,69,96,0.08)' : 'transparent'};border:none;width:100%;font-family:inherit;text-align:left;"
           >
             <Icon name="fileText" size={13} color={note.color || '#7c9eb2'} />
-            <span style="font-size:12.5px;color:#1a1a2e;font-weight:500;">{note.title}</span>
+            <span style="font-size:12.5px;color:var(--text);font-weight:500;">{note.title}</span>
             <span style="flex:1;"></span>
-            <span style="font-size:10.5px;color:#888899;">{note.folder}</span>
+            <span style="font-size:10.5px;color:var(--text-muted);">{note.folder}</span>
           </button>
         {/each}
       </div>
@@ -142,15 +142,15 @@
 
 <!-- Rechte Seite: Rendered Preview -->
 <div class="flex-1 flex flex-col min-w-0 min-h-0">
-  <div style="height:36px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid rgba(26,26,46,0.06);background:#fafaf8;flex-shrink:0;">
-    <span style="font-size:10.5px;font-weight:600;color:#888899;letter-spacing:0.8px;text-transform:uppercase;">{t('editor.preview')}</span>
+  <div style="height:36px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;">
+    <span style="font-size:10.5px;font-weight:600;color:var(--text-muted);letter-spacing:0.8px;text-transform:uppercase;">{t('editor.preview')}</span>
     <span style="flex:1;"></span>
-    <button style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+    <button style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;">
       <Icon name="maximize" size={13} />
     </button>
   </div>
-  <div style="flex:1;overflow:auto;padding:24px 32px;background:#fafaf8;">
-    <div style="max-width:560px;font-size:14.5px;line-height:1.7;color:#1a1a2e;" class="prose">
+  <div style="flex:1;overflow:auto;padding:24px 32px;background:var(--bg);">
+    <div style="max-width:560px;font-size:14.5px;line-height:1.7;color:var(--text);" class="prose">
       {@html renderedHtml}
     </div>
   </div>
@@ -163,10 +163,10 @@
   :global(.prose p) { margin: 0 0 14px; }
   :global(.prose ul, .prose ol) { padding-left: 22px; margin: 0 0 16px; }
   :global(.prose li) { margin-bottom: 4px; }
-  :global(.prose code) { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 0.9em; background: #f1f0ec; padding: 1px 5px; border-radius: 4px; color: #1a1a2e; }
+  :global(.prose code) { font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 0.9em; background: var(--bg-muted); padding: 1px 5px; border-radius: 4px; color: var(--text); }
   :global(.prose pre) { background: #1a1a2e; color: #e6e6f0; padding: 14px 16px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; margin: 0 0 16px; overflow: auto; }
   :global(.prose pre code) { background: none; padding: 0; color: inherit; }
-  :global(.prose blockquote) { margin: 16px 0; padding: 12px 16px; background: rgba(78,168,222,0.08); border-left: 3px solid #4ea8de; border-radius: 4px; color: #1a1a2e; }
+  :global(.prose blockquote) { margin: 16px 0; padding: 12px 16px; background: rgba(78,168,222,0.08); border-left: 3px solid #4ea8de; border-radius: 4px; color: var(--text); }
   :global(.prose a.wiki-link) { color: #e94560; text-decoration: none; font-weight: 500; background: rgba(233,69,96,0.10); padding: 1px 5px; border-radius: 4px; border-bottom: 1px dashed rgba(233,69,96,0.50); }
   :global(.prose strong) { font-weight: 700; }
 </style>

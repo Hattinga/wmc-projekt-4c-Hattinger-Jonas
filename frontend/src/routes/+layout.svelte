@@ -6,8 +6,12 @@
   import Icon from '$lib/components/ui/Icon.svelte';
   import { connectWs, disconnectWs } from '$lib/services/websocket.js';
   import { appState } from '$lib/stores/appState.svelte.js';
+  import { applyTheme, getStoredTheme } from '$lib/utils/theme.js';
 
   let { children } = $props();
+
+  // Theme global beim App-Start anwenden (nicht erst beim Besuch der Settings)
+  applyTheme(getStoredTheme());
 
   // Mobile-Sidebar nach jeder Navigation schließen (deckt alle Links + goto() ab)
   afterNavigate(() => {
@@ -43,10 +47,11 @@
     <!-- Hamburger (nur Mobile) -->
     <button
       onclick={() => { appState.sidebarOpen = !appState.sidebarOpen; }}
-      class="sm:hidden fixed top-2.5 left-3 z-30 flex items-center justify-center w-9 h-9 rounded-lg bg-white border border-[rgba(26,26,46,0.10)] shadow-sm"
+      class="sm:hidden fixed top-2.5 left-3 z-30 flex items-center justify-center w-9 h-9 rounded-lg bg-[var(--surface)] border border-[var(--border-strong)] shadow-sm"
+      style="color:var(--text);"
       title="Menü" aria-label="Menü öffnen"
     >
-      <Icon name="menu" size={18} color="#1a1a2e" />
+      <Icon name="menu" size={18} color="currentColor" />
     </button>
 
     <!-- Overlay (nur Mobile, schließt Sidebar) -->
