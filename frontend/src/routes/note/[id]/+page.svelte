@@ -6,6 +6,7 @@
   import MarkdownEditor from '$lib/components/editor/MarkdownEditor.svelte';
   import BacklinksPanel from '$lib/components/editor/BacklinksPanel.svelte';
   import { appState } from '$lib/stores/appState.svelte.js';
+  import { getSocket } from '$lib/services/websocket.js';
   import { t } from '$lib/i18n/index.js';
   import * as api from '$lib/services/api.js';
 
@@ -71,6 +72,37 @@
       }
     }, 800);
     return () => clearTimeout(saveTimer);
+  });
+
+  // Live-Sync: Änderungen aus anderem Tab/Gerät direkt im offenen Editor übernehmen.
+  // Lokale, noch nicht gespeicherte Eingaben haben Vorrang (werden nicht überschrieben).
+  $effect(() => {
+    if (!appState.wsConnected) return;
+    const socket = getSocket();
+    if (!socket) return;
+
+    const onRemoteUpdate = (updated) => {
+      if (!note || updated.id !== note.id) return;
+      const dirty = title !== note.title || content !== note.content;
+      if (dirty) return;
+      note = updated;
+      title = updated.title;
+      content = updated.content;
+    };
+    const onRemoteDelete = (deletedId) => {
+      if (!note || deletedId !== note.id) return;
+      clearTimeout(saveTimer);
+      saveTimer = null; // verhindert Re-Save der gelöschten Note in beforeNavigate
+      note = null;
+      goto('/dashboard');
+    };
+
+    socket.on('note:updated', onRemoteUpdate);
+    socket.on('note:deleted', onRemoteDelete);
+    return () => {
+      socket.off('note:updated', onRemoteUpdate);
+      socket.off('note:deleted', onRemoteDelete);
+    };
   });
 
   // Sofortiges Speichern bei Navigation (verhindert Lost-Update)
