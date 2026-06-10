@@ -17,6 +17,8 @@ export const appState = $state({
   tags: [],
   notes: [],
   wsConnected: false,
+  // Mobile: Sidebar als Slide-in (nur < 640px relevant, nicht persistiert)
+  sidebarOpen: false,
 });
 
 /** Zentraler Logout-Helper – räumt Token, User und State auf. */

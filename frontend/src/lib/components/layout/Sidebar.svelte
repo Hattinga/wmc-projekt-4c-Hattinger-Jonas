@@ -94,7 +94,10 @@
   }
 </script>
 
-<aside style="width:240px;background:#1a1a2e;color:#fff;display:flex;flex-direction:column;flex-shrink:0;height:100%;overflow:hidden;">
+<aside
+  class="w-60 flex flex-col shrink-0 h-full overflow-hidden fixed inset-y-0 left-0 z-50 transition-transform duration-200 sm:static sm:translate-x-0 {appState.sidebarOpen ? 'translate-x-0' : '-translate-x-full'}"
+  style="background:#1a1a2e;color:#fff;"
+>
 
   <!-- Logo -->
   <div style="padding:18px 18px 14px;display:flex;align-items:center;gap:8px;">

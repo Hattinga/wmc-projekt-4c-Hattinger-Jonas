@@ -99,7 +99,7 @@
 </script>
 
 <!-- Linke Seite: Markdown-Source -->
-<div style="flex:1;border-right:1px solid rgba(26,26,46,0.08);display:flex;flex-direction:column;min-width:0;">
+<div class="flex-1 flex flex-col min-w-0 min-h-0 border-b sm:border-b-0 sm:border-r border-[rgba(26,26,46,0.08)]">
   <!-- Pane header -->
   <div style="height:36px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid rgba(26,26,46,0.06);background:#fafaf8;flex-shrink:0;">
     <span style="font-size:10.5px;font-weight:600;color:#888899;letter-spacing:0.8px;text-transform:uppercase;">Markdown</span>
@@ -121,7 +121,7 @@
 
     <!-- [[Note]] Autocomplete -->
     {#if autocompleteOpen && suggestions.length > 0}
-      <div style="position:absolute;top:218px;left:188px;background:#fff;border:1px solid rgba(26,26,46,0.10);border-radius:8px;padding:4px;min-width:240px;box-shadow:0 10px 30px rgba(26,26,46,0.12);z-index:3;">
+      <div class="max-w-[calc(100vw-2rem)]" style="position:absolute;top:218px;left:188px;background:#fff;border:1px solid rgba(26,26,46,0.10);border-radius:8px;padding:4px;min-width:240px;box-shadow:0 10px 30px rgba(26,26,46,0.12);z-index:3;">
         <div style="font-size:10.5px;font-weight:600;color:#888899;padding:6px 10px;letter-spacing:0.5px;text-transform:uppercase;">Notiz einfügen</div>
         {#each suggestions as note, i}
           <button
@@ -140,7 +140,7 @@
 </div>
 
 <!-- Rechte Seite: Rendered Preview -->
-<div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+<div class="flex-1 flex flex-col min-w-0 min-h-0">
   <div style="height:36px;padding:0 18px;display:flex;align-items:center;border-bottom:1px solid rgba(26,26,46,0.06);background:#fafaf8;flex-shrink:0;">
     <span style="font-size:10.5px;font-weight:600;color:#888899;letter-spacing:0.8px;text-transform:uppercase;">Vorschau</span>
     <span style="flex:1;"></span>

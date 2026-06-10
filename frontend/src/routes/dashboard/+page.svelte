@@ -84,7 +84,7 @@
   <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
 
     <!-- Topbar -->
-    <div style="height:56px;border-bottom:1px solid rgba(26,26,46,0.08);display:flex;align-items:center;padding:0 20px;gap:16px;background:#fff;flex-shrink:0;">
+    <div class="pl-14 pr-5 sm:px-5" style="height:56px;border-bottom:1px solid rgba(26,26,46,0.08);display:flex;align-items:center;gap:16px;background:#fff;flex-shrink:0;">
       <div style="flex:1;max-width:420px;display:flex;align-items:center;gap:10px;background:#f6f5f2;border-radius:8px;padding:0 12px;height:36px;">
         <Icon name="search" size={15} color="#888899" />
         <input
@@ -124,7 +124,7 @@
     <div style="flex:1;display:flex;min-height:0;">
 
       <!-- Note list column -->
-      <div style="width:360px;border-right:1px solid rgba(26,26,46,0.08);display:flex;flex-direction:column;min-height:0;flex-shrink:0;">
+      <div class="w-full sm:w-[360px] flex flex-col min-h-0 shrink-0" style="border-right:1px solid rgba(26,26,46,0.08);">
         <div style="padding:20px 20px 14px;">
           <div style="display:flex;align-items:baseline;justify-content:space-between;">
             <h2 style="margin:0;font-size:19px;font-weight:700;letter-spacing:-0.4px;display:flex;align-items:center;gap:8px;">
@@ -148,7 +148,11 @@
         </div>
         <div style="flex:1;overflow:auto;padding:0 12px 12px;">
           {#each filteredNotes as note (note.id)}
-            <NoteCard {note} selected={note.id === selectedId} onclick={() => selectedId = note.id} />
+            <NoteCard {note} selected={note.id === selectedId} onclick={() => {
+              // Mobile (Preview ausgeblendet): direkt zur Notiz navigieren
+              if (window.matchMedia('(max-width: 639px)').matches) goto(`/note/${note.id}`);
+              else selectedId = note.id;
+            }} />
           {/each}
           {#if filteredNotes.length === 0}
             <div style="padding:32px 16px;text-align:center;color:#888899;font-size:13px;">
@@ -158,8 +162,8 @@
         </div>
       </div>
 
-      <!-- Preview column -->
-      <div style="flex:1;overflow:auto;padding:32px;min-width:0;background:#fafaf8;">
+      <!-- Preview column (auf Mobile ausgeblendet – NoteCard navigiert dort direkt) -->
+      <div class="hidden sm:block" style="flex:1;overflow:auto;padding:32px;min-width:0;background:#fafaf8;">
         {#if selectedNote}
           <div style="max-width:640px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">

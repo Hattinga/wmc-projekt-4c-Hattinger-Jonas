@@ -123,7 +123,7 @@
 <div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:Inter,system-ui,sans-serif;background:#fafaf8;overflow:hidden;color:#1a1a2e;">
 
   <!-- Topbar -->
-  <div style="height:56px;border-bottom:1px solid rgba(26,26,46,0.08);display:flex;align-items:center;padding:0 20px;gap:14px;background:#fff;flex-shrink:0;">
+  <div class="pl-14 pr-5 sm:px-5" style="height:56px;border-bottom:1px solid rgba(26,26,46,0.08);display:flex;align-items:center;gap:14px;background:#fff;flex-shrink:0;">
     <button onclick={() => goto('/dashboard')} style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;">
       <Icon name="chevLeft" size={18} />
     </button>
@@ -134,14 +134,15 @@
     </div>
   </div>
 
-  <div style="flex:1;display:flex;overflow:hidden;">
+  <div class="flex-1 flex flex-col sm:flex-row overflow-hidden">
 
-    <!-- Section nav -->
-    <div style="width:220px;padding:24px 14px;border-right:1px solid rgba(26,26,46,0.06);flex-shrink:0;overflow:auto;">
+    <!-- Section nav (Mobile: horizontale Chip-Leiste, ab sm: vertikale Spalte) -->
+    <div class="flex sm:flex-col gap-1 w-full sm:w-[220px] shrink-0 overflow-x-auto sm:overflow-y-auto p-3 sm:px-3.5 sm:py-6 border-b sm:border-b-0 sm:border-r border-[rgba(26,26,46,0.06)]">
       {#each sections as s}
         <button
           onclick={() => activeSection = s.id}
-          style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:7px;cursor:pointer;width:100%;border:1px solid {activeSection === s.id ? 'rgba(26,26,46,0.08)' : 'transparent'};background:{activeSection === s.id ? '#fff' : 'transparent'};color:{activeSection === s.id ? '#1a1a2e' : '#6b6b80'};font-size:13px;font-weight:{activeSection === s.id ? 600 : 500};margin-bottom:2px;box-shadow:{activeSection === s.id ? '0 1px 2px rgba(26,26,46,0.04)' : 'none'};font-family:inherit;text-align:left;"
+          class="shrink-0 whitespace-nowrap sm:w-full"
+          style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:7px;cursor:pointer;border:1px solid {activeSection === s.id ? 'rgba(26,26,46,0.08)' : 'transparent'};background:{activeSection === s.id ? '#fff' : 'transparent'};color:{activeSection === s.id ? '#1a1a2e' : '#6b6b80'};font-size:13px;font-weight:{activeSection === s.id ? 600 : 500};box-shadow:{activeSection === s.id ? '0 1px 2px rgba(26,26,46,0.04)' : 'none'};font-family:inherit;text-align:left;"
         >
           <Icon name={s.ic} size={15} color={activeSection === s.id ? '#e94560' : '#888899'} />
           {s.label}
@@ -150,7 +151,7 @@
     </div>
 
     <!-- Content -->
-    <div style="flex:1;overflow:auto;padding:32px 48px;">
+    <div class="flex-1 overflow-auto p-5 sm:p-8 lg:px-12">
       <div style="max-width:640px;">
 
         {#if activeSection === 'profil'}

@@ -116,11 +116,11 @@
   {/if}
 
   <!-- Topbar -->
-  <div style="height:52px;border-bottom:1px solid rgba(26,26,46,0.08);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0;">
+  <div class="pl-14 pr-4 sm:px-4" style="height:52px;border-bottom:1px solid rgba(26,26,46,0.08);display:flex;align-items:center;gap:12px;flex-shrink:0;">
     <button onclick={() => goto('/dashboard')} style="width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:#6b6b80;cursor:pointer;display:flex;align-items:center;justify-content:center;">
       <Icon name="chevLeft" size={18} />
     </button>
-    <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#888899;">
+    <div class="hidden sm:flex" style="align-items:center;gap:6px;font-size:12.5px;color:#888899;">
       <Icon name="folder" size={13} color="#4ea8de" />
       <span>{note?.folder || 'Notizen'}</span>
       <Icon name="chevRight" size={11} />
@@ -159,7 +159,7 @@
   </div>
 
   <!-- Title -->
-  <div style="padding:20px 28px 0;flex-shrink:0;">
+  <div class="px-4 pt-5 sm:px-7" style="flex-shrink:0;">
     <input
       bind:value={title}
       placeholder="Titel…"
@@ -170,8 +170,8 @@
   <!-- Toolbar -->
   <Toolbar onFormat={handleFormat} onInsertLink={handleInsertLink} />
 
-  <!-- Editor body -->
-  <div style="flex:1;display:flex;min-height:0;">
+  <!-- Editor body (Mobile: Markdown/Vorschau gestapelt, ab sm nebeneinander) -->
+  <div class="flex-1 flex flex-col sm:flex-row min-h-0">
     <MarkdownEditor
       bind:content
       bind:this={editorRef}
