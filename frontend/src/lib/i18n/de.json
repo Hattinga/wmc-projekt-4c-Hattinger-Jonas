@@ -79,6 +79,8 @@
     "deleteFailed": "Löschen fehlgeschlagen.",
     "deleteNote": "Notiz löschen",
     "deleteConfirm": "Notiz \"{title}\" wirklich löschen? Das kann nicht rückgängig gemacht werden.",
+    "addTag": "+ Tag…",
+    "removeTag": "Tag entfernen",
     "backlinksHint": "Notizen, die hierher verlinken",
     "noBacklinks": "Keine Notizen verlinken auf diese Notiz.",
     "openGraph": "Graph-Ansicht öffnen",

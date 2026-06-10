@@ -79,6 +79,8 @@
     "deleteFailed": "Deleting failed.",
     "deleteNote": "Delete note",
     "deleteConfirm": "Really delete note \"{title}\"? This cannot be undone.",
+    "addTag": "+ tag…",
+    "removeTag": "Remove tag",
     "backlinksHint": "Notes linking here",
     "noBacklinks": "No notes link to this note.",
     "openGraph": "Open graph view",

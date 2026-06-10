@@ -41,9 +41,9 @@ async function request(method, path, body) {
     throw new Error(err.error || err.message || `HTTP ${res.status}`);
   }
 
-  // 204 No Content (z.B. DELETE)
-  if (res.status === 204) return null;
-  return res.json();
+  // Leere Bodies abfangen (204 No Content, aber auch 201 ohne Body wie POST /tags/notes/:id)
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 // Auth

@@ -5,6 +5,7 @@
   import Toolbar from '$lib/components/editor/Toolbar.svelte';
   import MarkdownEditor from '$lib/components/editor/MarkdownEditor.svelte';
   import BacklinksPanel from '$lib/components/editor/BacklinksPanel.svelte';
+  import { appState } from '$lib/stores/appState.svelte.js';
   import { t } from '$lib/i18n/index.js';
   import * as api from '$lib/services/api.js';
 
@@ -91,6 +92,56 @@
 
   let deleting = $state(false);
 
+  // --- Tags ---
+  let tagInput = $state('');
+  let tagError = $state('');
+
+  async function refreshSidebarTags() {
+    try {
+      const r = await api.getTags();
+      appState.tags = r.tags ?? [];
+    } catch {}
+  }
+
+  async function addTag() {
+    const name = tagInput.trim().replace(/^#/, '');
+    if (!name || !note) return;
+    tagError = '';
+    try {
+      let tag = appState.tags.find(tg => tg.name.toLowerCase() === name.toLowerCase());
+      if (!tag) {
+        try {
+          const r = await api.createTag({ name });
+          tag = r.tag;
+        } catch (e) {
+          // 409: Tag existiert schon (z.B. anderer Tab) → Liste nachladen und wiederverwenden
+          await refreshSidebarTags();
+          tag = appState.tags.find(tg => tg.name.toLowerCase() === name.toLowerCase());
+          if (!tag) throw e;
+        }
+      }
+      if (!note.tags?.some(tg => tg.id === tag.id)) {
+        await api.addTagToNote(note.id, tag.id);
+        note.tags = [...(note.tags ?? []), tag];
+      }
+      tagInput = '';
+      refreshSidebarTags();
+    } catch (e) {
+      tagError = e.message || '';
+    }
+  }
+
+  async function removeTag(tag) {
+    if (!note) return;
+    try {
+      await api.removeTagFromNote(note.id, tag.id);
+      note.tags = (note.tags ?? []).filter(tg => tg.id !== tag.id);
+      refreshSidebarTags();
+    } catch (e) {
+      tagError = e.message || '';
+    }
+  }
+
   async function deleteNote() {
     if (!note || deleting) return;
     if (!confirm(t('editor.deleteConfirm', { title: note.title }))) return;
@@ -166,6 +217,29 @@
       placeholder={t('editor.titlePlaceholder')}
       style="width:100%;border:none;outline:none;font-size:28px;font-weight:700;letter-spacing:-0.6px;color:#1a1a2e;font-family:inherit;background:transparent;padding:0;"
     />
+  </div>
+
+  <!-- Tags -->
+  <div class="px-4 sm:px-7" style="padding-top:10px;padding-bottom:4px;flex-shrink:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+    {#each note?.tags ?? [] as tag (tag.id)}
+      <span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;padding:3px 6px 3px 9px;border-radius:12px;background:#f6f5f2;border:1px solid rgba(26,26,46,0.10);color:#6b6b80;font-weight:500;">
+        #{tag.name}
+        <button
+          onclick={() => removeTag(tag)}
+          title={t('editor.removeTag')} aria-label={t('editor.removeTag')}
+          style="border:none;background:transparent;cursor:pointer;padding:0;display:flex;color:#888899;"
+        ><Icon name="x" size={10} /></button>
+      </span>
+    {/each}
+    <input
+      bind:value={tagInput}
+      onkeydown={(e) => { if (e.key === 'Enter') addTag(); }}
+      placeholder={t('editor.addTag')}
+      style="border:none;outline:none;background:transparent;font-size:11.5px;color:#1a1a2e;font-family:inherit;width:90px;padding:3px 0;"
+    />
+    {#if tagError}
+      <span style="font-size:11px;color:#e94560;">{tagError}</span>
+    {/if}
   </div>
 
   <!-- Toolbar -->
