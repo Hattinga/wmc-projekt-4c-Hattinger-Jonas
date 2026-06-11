@@ -187,4 +187,17 @@
 - **Verifiziert:** Builds ✓; Tag-/Graph-Daten via Seed; Kontraste der Dark-Tokens rechnerisch geprüft
 - **Integration:** 6 Commits (fix graph, feat ws, feat folders, feat theme, polish a11y, docs)
 
+### Session 15 – 11.06.2026 (Abgabetag)
+- **Tool:** Claude Code (CLI) — /plan, danach Umsetzung
+- **Zweck:** Abgabetag abarbeiten: Test-Checkliste, Blocker-Triage, Doku-Abschluss, finaler Push; zusätzlich Präsentations-Briefing für die Folien-Erstellung
+- **Prompt (Zusammenfassung):** „Lies die Docs und mach einen Plan für den letzten Tag" → Plan aus ENDSPURT.md (Donnerstag) verfeinert; statt rein manueller Checkliste ein automatisiertes Smoke-Test-Skript vorgeschlagen und umgesetzt
+- **Ergebnis:**
+  - `frontend/smoke-test.mjs` — 26 automatisierte Checks gegen das laufende Backend: Auth (Register/Login/401/Guard), Notes-CRUD, Ordner inkl. Verschachtelung, `[[Link]]`→Backlink, Graph-Nodes/-Edges, Tags-Flow, WebSocket-Events (`note:created/updated/deleted` über echten Socket.io-Client), Settings (Profil + Passwortwechsel mit Re-Login-Probe) — **alle 26 ✅, kein Blocker**
+  - 1 anfänglicher Test-Fehlschlag entpuppte sich als falsche Test-Erwartung: Unterordner werden beim Löschen des Parents per `ON DELETE SET NULL` auf Root gehoben (beabsichtigt, analog zu Notes) — Erwartung korrigiert, kein Code-Fix nötig
+  - Produktions-Build ✓; Smoke-Test-Daten direkt über die DB aufgeräumt (User-CASCADE)
+  - Doku finalisiert: KW24-Protokoll (inkl. Checklisten-Tabelle), FORTSCHRITT.md, README (Dark Mode + Smoke-Test ergänzt)
+  - `docs/PRAESI_BRIEFING.md` (lokal, gitignored): vollständiges Briefing für die Erstellung der 10-min-Englisch-Präsentation
+- **Verifiziert:** Smoke-Test 26/26; `npm run build` ✓; `git status` clean nach finalem Push
+- **Integration:** 2 Commits (test smoke, docs kw24) + finaler Push
+
 <!-- Weitere Sessions hier anhängen -->

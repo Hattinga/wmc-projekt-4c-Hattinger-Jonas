@@ -51,5 +51,15 @@ docs/       → Wochenprotokolle, AI-Log, Fortschritt
 - Echtzeit-Updates via WebSocket
 - Mehrsprachig (DE/EN)
 - Responsive Design (Mobile-First)
+- Dark Mode (light / dark / system)
+
+## Tests
+
+Smoke-Test gegen das laufende Backend (26 Checks: Auth, Notes, Ordner, Links/Backlinks, Graph, Tags, WebSocket, Settings):
+
+```bash
+cd frontend
+node smoke-test.mjs   # Backend muss auf Port 3000 laufen
+```
 
 <img width="2816" height="1536" alt="Gemini_Generated_Image_5gepix5gepix5gep" src="https://github.com/user-attachments/assets/c0f43638-2830-4c50-ba89-2c3fe87b1edc" />
